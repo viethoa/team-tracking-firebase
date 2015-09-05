@@ -87,7 +87,7 @@ public class FireBaseAction {
 
 
     public static void pushMessage(Context context, MessageModel message) {
-        if (!message.isNotNull())
+        if (!message.isValid())
             return;
 
         //Send to FireBase

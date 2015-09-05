@@ -28,7 +28,7 @@ public class MessageModel implements Serializable {
         this.channel_name = channel_name;
     }
 
-    public boolean isNotNull() {
+    public boolean isValid() {
         if (id == null)
             return false;
 
