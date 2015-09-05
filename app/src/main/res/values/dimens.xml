@@ -8,9 +8,9 @@
     <dimen name="xlarge_space">20dp</dimen>
     <dimen name="xxlarge_space">25dp</dimen>
 
-    <dimen name="font_small">12dp</dimen>
-    <dimen name="font_medium">15dp</dimen>
-    <dimen name="font_large">18dp</dimen>
+    <dimen name="font_small">14dp</dimen>
+    <dimen name="font_medium">18dp</dimen>
+    <dimen name="font_large">22dp</dimen>
     <dimen name="font_no_data_view">16dp</dimen>
 
     <dimen name="no_data_view_margin">60dp</dimen>

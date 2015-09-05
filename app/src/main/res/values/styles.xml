@@ -10,10 +10,10 @@
     <style name="Base.AppTheme" parent="Theme.AppCompat.Light">
         <item name="colorPrimary">@color/app_primary_color</item>
         <item name="colorPrimaryDark">@color/app_primary_color_dark</item>
-        <item name="colorAccent">@color/app_primary_color_dark</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="windowActionBar">false</item>
-        <item name="textAllCaps">false</item>
+        <item name="colorAccent">@color/app_primary_color</item>
+        <!--<item name="android:windowNoTitle">true</item>-->
+        <!--<item name="windowActionBar">false</item>-->
+        <!--<item name="textAllCaps">false</item>-->
     </style>
 
     <!-- no data view style -->
