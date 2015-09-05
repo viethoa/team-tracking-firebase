@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="app_primary_color">#F44336</color>
+    <color name="app_primary_color_dark">#c31c13</color>
+    <color name="tabs_scroll_color">#B71C1C</color>
+
+    <color name="app_highlight_color">#BDBDBD</color>
+    <color name="app_effect_color_light">#f6f6f6</color>
+    <color name="white_transparent">#77ffffff</color>
+    <color name="transparent">#00000000</color>
+
+    <color name="app_line_color">#FF5252</color>
+    <color name="app_green_color">#43A047</color>
+    <color name="app_orange_color">#ffef9c01</color>
+    <color name="app_blue_color">#2196F3</color>
+    <color name="app_teal_color">#009688</color>
+
+    <color name="text_color_hint">#ffb7b7b7</color>
+    <color name="text_color_black">#FF333333</color>
+    <color name="text_color_dark">#FF555555</color>
+    <color name="text_color_gray">#FF777777</color>
+    <color name="text_color_light">#FF999999</color>
+    <color name="text_color_bright">#FFFFFFFF</color>
+
+
+</resources>

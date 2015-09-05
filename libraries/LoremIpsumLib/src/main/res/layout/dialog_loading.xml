@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:background="#00000000">
+
+    <View
+        android:id="@+id/loading_circle_view"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:background="@drawable/bg_badge_circle_blue"/>
+
+</LinearLayout>

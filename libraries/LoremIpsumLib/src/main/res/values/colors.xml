@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="app_primary_color">#F44336</color>
+
+    <color name="loremipsum_primary_white">#FFFFFF</color>
+    <color name="loremipsum_primary_black">#FFFFFF</color>
+
+    <color name="loremipsum_primary_red">#F44336</color>
+    <color name="loremipsum_primary_green">#00ff00</color>
+    <color name="loremipsum_primary_blue">#0073CD</color>
+    <color name="loremipsum_primary_dark_blue">#0B4868</color>
+    <color name="loremipsum_primary_light_gray">#999999</color>
+
+    <color name="loremipsum_white_alpha">#88FFFFFF</color>
+    <color name="loremipsum_blue_alpha">#880073CD</color>
+    <color name="loremipsum_orange_alpha">#AAFF5B39</color>
+    <color name="loremipsum_primary_orange">#FFFF5B39</color>
+
+    <color name="loremipsum_progress_color">#00000000</color>
+</resources>
