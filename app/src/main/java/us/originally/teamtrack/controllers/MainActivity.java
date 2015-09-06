@@ -2,6 +2,7 @@ package us.originally.teamtrack.controllers;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
@@ -25,6 +26,7 @@ import us.originally.teamtrack.modules.firebase.FireBaseAction;
 public class MainActivity extends BaseActivity {
 
     private static final String CHANNEL_NAME = "temp_channel";
+    protected LinearLayoutManager mLayoutManager;
 
     @InjectView(R.id.btn_speak)
     Button btnSpeak;
@@ -40,14 +42,16 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
+        eventBus = new EventBus();
+        FireBaseAction.registerMessageListener(this, CHANNEL_NAME);
 
         initialiseData();
         initialiseUI();
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
         eventBus.getDefault().register(this);
     }
 
@@ -62,14 +66,15 @@ public class MainActivity extends BaseActivity {
     //----------------------------------------------------------------------------------------------
 
     protected void initialiseData() {
-        eventBus = new EventBus();
-
         mDataArray = new ArrayList<MessageModel>();
         mAdapter = new ChattingAdapter(this, mDataArray);
     }
 
     protected void initialiseUI() {
         //Recycle view
+        mRecycleView.setHasFixedSize(true);
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecycleView.setLayoutManager(mLayoutManager);
         mRecycleView.setAdapter(mAdapter);
 
         //Capture audio

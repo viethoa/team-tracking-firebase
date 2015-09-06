@@ -75,9 +75,9 @@ public class ChattingAdapter extends RecyclerView.Adapter<ChattingAdapter.ViewHo
         if (messageModel == null || messageModel.audio == null)
             return;
 
-        holder.btnPlay.setCompoundDrawables(mContext.getResources().getDrawable(R.mipmap.ic_pause), null, null, null);
+        holder.btnPlay.setCompoundDrawablesWithIntrinsicBounds(mContext.getResources().getDrawable(R.mipmap.ic_pause), null, null, null);
         AudioRecordManager.startPlaying(messageModel.audio);
 
-        holder.btnPlay.setCompoundDrawables(mContext.getResources().getDrawable(R.mipmap.ic_play), null, null, null);
+        holder.btnPlay.setCompoundDrawablesWithIntrinsicBounds(mContext.getResources().getDrawable(R.mipmap.ic_play), null, null, null);
     }
 }

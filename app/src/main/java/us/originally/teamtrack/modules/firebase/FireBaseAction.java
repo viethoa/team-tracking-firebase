@@ -7,6 +7,7 @@ import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
+import com.firebase.client.Query;
 
 import de.greenrobot.event.EventBus;
 import us.originally.teamtrack.EventBus.MessageEvent;
@@ -23,7 +24,7 @@ public class FireBaseAction {
 
     protected static EventBus eventBus;
     protected static Firebase firebaseRef;
-    protected static ChildEventListener orderListener;
+    protected static ChildEventListener childEventListener;
 
     protected static Firebase getFirebaseRef(Context context) {
         if (firebaseRef != null)
@@ -37,11 +38,11 @@ public class FireBaseAction {
         return firebaseRef;
     }
 
-    protected static void initListener() {
-        if (orderListener != null)
+    public static void initListener() {
+        if (childEventListener != null)
             return;
 
-        orderListener = new ChildEventListener() {
+        childEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 childAdded(dataSnapshot);
@@ -69,45 +70,63 @@ public class FireBaseAction {
         };
     }
 
+    public static void registerMessageListener(Context context, String channelName) {
+        Firebase ref = getFirebaseRef(context);
+        if (ref == null)
+            return;
+
+        initListener();
+        Query messageQuery = ref.child(channelName);
+        messageQuery.addChildEventListener(childEventListener);
+    }
+
+    protected static void getAllMessageFromChannel(DataSnapshot dataSnapshot) {
+        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+            childAdded(snapshot);
+        }
+    }
+
     protected static void childAdded(DataSnapshot dataSnapshot) {
+        System.out.println(dataSnapshot.getValue());
         if (eventBus == null)
             eventBus = new EventBus();
 
         MessageModel message = null;
         try {
             message = dataSnapshot.getValue(MessageModel.class);
-        } catch(Exception e) {
-            e.fillInStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         if (message == null)
             return;
 
+        Log.d(TAG, "post message to UI Thread");
         eventBus.getDefault().post(new MessageEvent(message));
     }
 
 
-    public static void pushMessage(Context context, MessageModel message) {
-        if (!message.isNotNull())
-            return;
+    public static void pushMessage(Context context, final MessageModel message) {
+//        if (!message.isNotNull())
+//            return;
 
-        //Send to FireBase
         Firebase ref = getFirebaseRef(context);
         if (ref == null)
             return;
 
         String channelName = message.channel_name;
         String messageId = "message_" + message.id.toString();
-
         ref.child(channelName).child(messageId).setValue(message, new Firebase.CompletionListener() {
 
             @Override
             public void onComplete(FirebaseError firebaseError, Firebase firebase) {
                 if (firebaseError != null) {
-                    Log.e(TAG, "FireBase data message could not be saved. " + firebaseError.getMessage());
+                    Log.e(TAG, "FireBase message could not be saved. " + firebaseError.getMessage());
                 } else {
-                    Log.e(TAG, "FireBase data message saved successfully.");
+                    Log.e(TAG, "FireBase message saved successfully.");
                 }
             }
         });
+
+        //ref.child(channelName).child(messageId).addChildEventListener(childEventListener);
     }
 }
