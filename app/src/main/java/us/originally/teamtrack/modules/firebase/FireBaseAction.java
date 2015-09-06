@@ -8,6 +8,7 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.Query;
+import com.lorem_ipsum.utils.StringUtils;
 
 import de.greenrobot.event.EventBus;
 import us.originally.teamtrack.EventBus.MessageEvent;
@@ -105,7 +106,7 @@ public class FireBaseAction {
     }
 
     public static void pushMessage(Context context, final MessageModel message) {
-        if (!message.isValid())
+        if (!isMessageValid(message))
             return;
 
         Firebase ref = getFirebaseRef(context);
@@ -125,5 +126,17 @@ public class FireBaseAction {
                 }
             }
         });
+    }
+
+    protected static boolean isMessageValid(MessageModel message) {
+        if (message == null || message.id == null)
+            return false;
+
+        boolean isNotNull = StringUtils.isNotNull(message.message);
+        if (!isNotNull) {
+            isNotNull = (message.audio != null && message.audio.size() > 0);
+        }
+
+        return isNotNull;
     }
 }
