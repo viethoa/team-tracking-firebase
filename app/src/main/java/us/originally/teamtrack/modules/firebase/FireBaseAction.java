@@ -81,12 +81,6 @@ public class FireBaseAction {
         messageQuery.addChildEventListener(childEventListener);
     }
 
-    protected static void getAllMessageFromChannel(DataSnapshot dataSnapshot) {
-        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-            childAdded(snapshot);
-        }
-    }
-
     protected static void childAdded(DataSnapshot dataSnapshot) {
         System.out.println(dataSnapshot.getValue());
         if (eventBus == null)
