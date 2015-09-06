@@ -104,10 +104,9 @@ public class FireBaseAction {
         eventBus.getDefault().post(new MessageEvent(message));
     }
 
-
     public static void pushMessage(Context context, final MessageModel message) {
-//        if (!message.isNotNull())
-//            return;
+        if (!message.isValid())
+            return;
 
         Firebase ref = getFirebaseRef(context);
         if (ref == null)
@@ -126,7 +125,5 @@ public class FireBaseAction {
                 }
             }
         });
-
-        //ref.child(channelName).child(messageId).addChildEventListener(childEventListener);
     }
 }

@@ -1,5 +1,7 @@
 package us.originally.teamtrack.modules.chat;
 
+import com.lorem_ipsum.utils.StringUtils;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -26,15 +28,15 @@ public class MessageModel implements Serializable {
         this.channel_name = channel_name;
     }
 
-//    public boolean isNotNull() {
-//        if (id == null)
-//            return false;
-//
-//        boolean isNotNull = StringUtils.isNotNull(message);
-//        if (!isNotNull) {
-//            isNotNull = (audio != null && audio.size() > 0);
-//        }
-//
-//        return isNotNull;
-//    }
+    public boolean isValid() {
+        if (id == null)
+            return false;
+
+        boolean isNotNull = StringUtils.isNotNull(message);
+        if (!isNotNull) {
+            isNotNull = (audio != null && audio.size() > 0);
+        }
+
+        return isNotNull;
+    }
 }
