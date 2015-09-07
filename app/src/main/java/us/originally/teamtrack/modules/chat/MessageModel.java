@@ -10,8 +10,6 @@ import us.originally.teamtrack.modules.chat.audio.AudioModel;
  */
 public class MessageModel implements Serializable {
 
-    public String channel_name;
-
     public Integer id;
     public String message;
     public List<AudioModel> audio;
@@ -19,10 +17,9 @@ public class MessageModel implements Serializable {
     public MessageModel() {
     }
 
-    public MessageModel(String channel_name, int id, String message, List<AudioModel> audio) {
+    public MessageModel(int id, String message, List<AudioModel> audio) {
         this.id = id;
         this.message = message;
         this.audio = audio;
-        this.channel_name = channel_name;
     }
 }

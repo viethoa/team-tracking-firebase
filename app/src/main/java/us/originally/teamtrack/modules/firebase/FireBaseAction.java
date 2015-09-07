@@ -10,10 +10,14 @@ import com.firebase.client.FirebaseError;
 import com.firebase.client.Query;
 import com.lorem_ipsum.utils.StringUtils;
 
+import java.util.Random;
+
 import de.greenrobot.event.EventBus;
 import us.originally.teamtrack.EventBus.MessageEvent;
 import us.originally.teamtrack.R;
 import us.originally.teamtrack.modules.chat.MessageModel;
+import us.originally.teamtrack.modules.chat.audio.AudioModel;
+import us.originally.teamtrack.modules.chat.audio.AudioStreamManager;
 
 
 /**
@@ -71,7 +75,7 @@ public class FireBaseAction {
         };
     }
 
-    public static void registerMessageListener(Context context, String channelName) {
+    public static void registerEventListener(Context context, String channelName) {
         Firebase ref = getFirebaseRef(context);
         if (ref == null)
             return;
@@ -86,20 +90,20 @@ public class FireBaseAction {
         if (eventBus == null)
             eventBus = new EventBus();
 
-        MessageModel message = null;
-        try {
-            message = dataSnapshot.getValue(MessageModel.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (message == null)
+        //-------------------------------------------------------
+        //  Audio message case
+        if (onReceiveMessage(dataSnapshot))
             return;
 
-        Log.d(TAG, "post message to UI Thread");
-        eventBus.getDefault().post(new MessageEvent(message));
+        //-------------------------------------------------------
+        //  Audio stream case
+        onReceiveAudio(dataSnapshot);
     }
 
-    public static void pushMessage(Context context, final MessageModel message) {
+    //----------------------------------------------------------------------------------------------
+    // Audio message section
+
+    public static void pushMessage(Context context, String channelName, final MessageModel message) {
         if (!isMessageValid(message))
             return;
 
@@ -107,7 +111,6 @@ public class FireBaseAction {
         if (ref == null)
             return;
 
-        String channelName = message.channel_name;
         String messageId = "message_" + message.id.toString();
         ref.child(channelName).child(messageId).setValue(message, new Firebase.CompletionListener() {
 
@@ -122,6 +125,21 @@ public class FireBaseAction {
         });
     }
 
+    protected static boolean onReceiveMessage(DataSnapshot dataSnapshot) {
+        MessageModel message = null;
+        try {
+            message = dataSnapshot.getValue(MessageModel.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (message == null)
+            return false;
+
+        Log.d(TAG, "post message to UI Thread");
+        eventBus.getDefault().post(new MessageEvent(message));
+        return true;
+    }
+
     protected static boolean isMessageValid(MessageModel message) {
         if (message == null || message.id == null)
             return false;
@@ -132,5 +150,50 @@ public class FireBaseAction {
         }
 
         return isNotNull;
+    }
+
+    //----------------------------------------------------------------------------------------------
+    // Stream section
+
+    public static void pushAudio(Context context, String channelName, AudioModel audioModel) {
+        if (!isAudioValid(audioModel))
+            return;
+
+        Firebase ref = getFirebaseRef(context);
+        if (ref == null)
+            return;
+
+        Random random = new Random();
+        int id = random.nextInt(1000000);
+        String audioId = "audio_" + id;
+
+        ref.child(channelName).child(audioId).setValue(audioModel, new Firebase.CompletionListener() {
+            @Override
+            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                if (firebaseError != null) {
+                    Log.e(TAG, "FireBase audio could not be saved. " + firebaseError.getMessage());
+                } else {
+                    Log.e(TAG, "FireBase audio saved successfully.");
+                }
+            }
+        });
+    }
+
+    protected static boolean onReceiveAudio(DataSnapshot dataSnapshot) {
+        AudioModel audio = null;
+        try {
+            audio = dataSnapshot.getValue(AudioModel.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (audio == null)
+            return false;
+
+        AudioStreamManager.startPlaying(audio);
+        return true;
+    }
+
+    protected static boolean isAudioValid(AudioModel audio) {
+        return (audio != null && audio.size != null && audio.size > 0 && StringUtils.isNotNull(audio.encode));
     }
 }

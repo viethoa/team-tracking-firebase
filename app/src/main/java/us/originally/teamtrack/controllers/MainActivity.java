@@ -43,7 +43,7 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
         eventBus = new EventBus();
-        FireBaseAction.registerMessageListener(this, CHANNEL_NAME);
+        FireBaseAction.registerEventListener(this, CHANNEL_NAME);
 
         initialiseData();
         initialiseUI();
@@ -133,7 +133,7 @@ public class MainActivity extends BaseActivity {
 
         Random random = new Random();
         int id = random.nextInt(1000000);
-        MessageModel message = new MessageModel(CHANNEL_NAME, id, null, audio);
-        FireBaseAction.pushMessage(this, message);
+        MessageModel message = new MessageModel(id, null, audio);
+        FireBaseAction.pushMessage(this, CHANNEL_NAME, message);
     }
 }

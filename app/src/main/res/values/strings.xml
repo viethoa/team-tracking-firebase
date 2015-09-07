@@ -4,4 +4,6 @@
     <string name="action_settings">Settings</string>
     <string name="str_recording">Recording...</string>
     <string name="str_speak">Speak</string>
+    <string name="title_activity_audio_stream">AudioStreamActivity</string>
+    <string name="str_subscribe">Subscribe</string>
 </resources>
