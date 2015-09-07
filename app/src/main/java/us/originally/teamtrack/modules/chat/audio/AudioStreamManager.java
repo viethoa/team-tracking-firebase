@@ -71,8 +71,8 @@ public class AudioStreamManager {
         mRecorder.startRecording();
 
         //Encoding:
-        byte[] buffer = new byte[4096];
-        byte[] outBuffer = new byte[4096];
+        byte[] buffer = new byte[10240];
+        byte[] outBuffer = new byte[10240];
         int size;
 
         //Capture audio
