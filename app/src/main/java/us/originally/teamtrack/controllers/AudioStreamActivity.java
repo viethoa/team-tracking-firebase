@@ -1,5 +1,6 @@
 package us.originally.teamtrack.controllers;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
@@ -9,7 +10,7 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import us.originally.teamtrack.R;
 import us.originally.teamtrack.modules.chat.audio.AudioStreamManager;
-import us.originally.teamtrack.modules.firebase.FireBaseAction;
+import us.originally.teamtrack.services.AudioService;
 
 public class AudioStreamActivity extends AppCompatActivity {
 
@@ -24,9 +25,12 @@ public class AudioStreamActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_audio_stream);
         ButterKnife.inject(this);
-        FireBaseAction.registerEventListener(this, AUDIO_CHANNEL);
+        //FireBaseAction.registerEventListener(this, AUDIO_CHANNEL);
 
         initialiseData();
+
+        Intent intent = new Intent(this, AudioService.class);
+        startService(intent);
     }
 
     protected void initialiseData() {
