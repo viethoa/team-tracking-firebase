@@ -80,8 +80,8 @@ public class AudioStreamManager {
         }
 
         //Encoding:
-        byte[] buffer = new byte[10240];
-        byte[] outBuffer = new byte[10240];
+        byte[] buffer = new byte[6400];
+        byte[] outBuffer = new byte[6400];
         int size;
 
         //Capture audio

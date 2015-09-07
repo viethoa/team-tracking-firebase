@@ -95,13 +95,14 @@ public class FireBaseAction {
             eventBus = new EventBus();
 
         //-------------------------------------------------------
-        //  Audio message case
-        if (onReceiveMessage(dataSnapshot))
+        //  Audio stream case
+        if (onReceiveAudio(dataSnapshot))
             return;
 
         //-------------------------------------------------------
-        //  Audio stream case
-        onReceiveAudio(dataSnapshot);
+        //  Audio message case
+        onReceiveMessage(dataSnapshot);
+            
     }
 
     //----------------------------------------------------------------------------------------------
