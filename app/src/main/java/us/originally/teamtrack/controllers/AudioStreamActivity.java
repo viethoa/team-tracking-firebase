@@ -14,7 +14,7 @@ import us.originally.teamtrack.modules.firebase.FireBaseAction;
 public class AudioStreamActivity extends AppCompatActivity {
 
     public static final String AUDIO_CHANNEL = "audio_channel";
-    private boolean isAudioStream;
+    public static boolean isAudioStream;
 
     @InjectView(R.id.btn_speak)
     Button btnSpeak;
@@ -42,6 +42,7 @@ public class AudioStreamActivity extends AppCompatActivity {
             return;
         }
 
+        isAudioStream = true;
         btnSpeak.setText(R.string.str_recording);
         new Thread(new Runnable() {
             @Override

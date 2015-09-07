@@ -15,6 +15,7 @@ import java.util.Random;
 import de.greenrobot.event.EventBus;
 import us.originally.teamtrack.EventBus.MessageEvent;
 import us.originally.teamtrack.R;
+import us.originally.teamtrack.controllers.AudioStreamActivity;
 import us.originally.teamtrack.modules.chat.MessageModel;
 import us.originally.teamtrack.modules.chat.audio.AudioModel;
 import us.originally.teamtrack.modules.chat.audio.AudioStreamManager;
@@ -180,6 +181,9 @@ public class FireBaseAction {
     }
 
     protected static boolean onReceiveAudio(DataSnapshot dataSnapshot) {
+        if (AudioStreamActivity.isAudioStream)
+            return false;
+
         AudioModel audio = null;
         try {
             audio = dataSnapshot.getValue(AudioModel.class);
