@@ -8,6 +8,8 @@ import android.media.MediaRecorder;
 import android.util.Base64;
 import android.util.Log;
 
+import com.lorem_ipsum.utils.DeviceUtils;
+
 import us.originally.teamtrack.controllers.AudioStreamActivity;
 import us.originally.teamtrack.modules.firebase.FireBaseAction;
 
@@ -25,6 +27,8 @@ public class AudioStreamManager {
     private static int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
     private static int minBufSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat);
 
+    private static int audioTimeStamp = 0;
+    private static String uuid = null;
     private static CMG711 uLawCodec = new CMG711();
 
     //**********************************************************************************************
@@ -69,6 +73,11 @@ public class AudioStreamManager {
     public static void startRecording(Context context) {
         mRecorder = new AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, channelConfig, audioFormat, minBufSize * 10);
         mRecorder.startRecording();
+        audioTimeStamp = 0;
+
+        if (uuid == null) {
+            uuid = DeviceUtils.getDeviceUUID(context);
+        }
 
         //Encoding:
         byte[] buffer = new byte[10240];
@@ -77,6 +86,7 @@ public class AudioStreamManager {
 
         //Capture audio
         while (mRecorder != null) {
+            audioTimeStamp += 1;
             size = mRecorder.read(buffer, 0, buffer.length);
 
             //uLaw Encoding:
@@ -86,7 +96,7 @@ public class AudioStreamManager {
             String strEncoded = Base64.encodeToString(outBuffer, 2);
 
             //Stream audio data
-            AudioModel audio = new AudioModel(strEncoded, size);
+            AudioModel audio = new AudioModel(strEncoded, size, String.valueOf(audioTimeStamp), uuid);
             FireBaseAction.pushAudio(context, AudioStreamActivity.AUDIO_CHANNEL, audio);
         }
     }

@@ -8,14 +8,12 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.Query;
+import com.lorem_ipsum.utils.DeviceUtils;
 import com.lorem_ipsum.utils.StringUtils;
-
-import java.util.Random;
 
 import de.greenrobot.event.EventBus;
 import us.originally.teamtrack.EventBus.MessageEvent;
 import us.originally.teamtrack.R;
-import us.originally.teamtrack.controllers.AudioStreamActivity;
 import us.originally.teamtrack.modules.chat.MessageModel;
 import us.originally.teamtrack.modules.chat.audio.AudioModel;
 import us.originally.teamtrack.modules.chat.audio.AudioStreamManager;
@@ -27,6 +25,7 @@ import us.originally.teamtrack.modules.chat.audio.AudioStreamManager;
 public class FireBaseAction {
 
     protected static String TAG = "ChattingAction";
+    protected static String myUUID = null;
 
     protected static EventBus eventBus;
     protected static Firebase firebaseRef;
@@ -80,6 +79,10 @@ public class FireBaseAction {
         Firebase ref = getFirebaseRef(context);
         if (ref == null)
             return;
+
+        if (myUUID == null) {
+            myUUID = DeviceUtils.getDeviceUUID(context);
+        }
 
         initListener();
         Query messageQuery = ref.child(channelName);
@@ -164,10 +167,7 @@ public class FireBaseAction {
         if (ref == null)
             return;
 
-        Random random = new Random();
-        int id = random.nextInt(1000000);
-        String audioId = "audio_" + id;
-
+        String audioId = "audio_" + audioModel.timestamp;
         ref.child(channelName).child(audioId).setValue(audioModel, new Firebase.CompletionListener() {
             @Override
             public void onComplete(FirebaseError firebaseError, Firebase firebase) {
@@ -181,9 +181,6 @@ public class FireBaseAction {
     }
 
     protected static boolean onReceiveAudio(DataSnapshot dataSnapshot) {
-        if (AudioStreamActivity.isAudioStream)
-            return false;
-
         AudioModel audio = null;
         try {
             audio = dataSnapshot.getValue(AudioModel.class);
@@ -192,6 +189,10 @@ public class FireBaseAction {
         }
         if (audio == null)
             return false;
+
+        //Do not play audio by myself
+        if (myUUID.equals(audio.uuid))
+            return true;
 
         AudioStreamManager.startPlaying(audio);
         return true;

@@ -14,7 +14,7 @@ public class TeamTrackApplication extends AppUtils {
     public void onCreate() {
         super.onCreate();
 
-        //initialiseParse();
+        initialiseParse();
     }
 
     protected void initialiseParse() {

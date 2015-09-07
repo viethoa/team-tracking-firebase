@@ -1,11 +1,14 @@
 package us.originally.teamtrack.modules.chat.audio;
 
+import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
 import android.media.MediaRecorder;
 import android.util.Base64;
 import android.util.Log;
+
+import com.lorem_ipsum.utils.DeviceUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +28,8 @@ public class AudioRecordManager {
     private static int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
     private static int minBufSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat);
 
+    private static String uuid = null;
+    private static int audioTimeStamp = 0;
     private static CMG711 uLawCodec = new CMG711();
     public static ArrayList<AudioModel> AudiosEndCoded;
 
@@ -65,9 +70,14 @@ public class AudioRecordManager {
     //  Recorder
     //**********************************************************************************************
 
-    public static void startRecording() {
+    public static void startRecording(Context context) {
         mRecorder = new AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, channelConfig, audioFormat, minBufSize * 10);
         mRecorder.startRecording();
+
+        audioTimeStamp = 0;
+        if (uuid == null) {
+            uuid = DeviceUtils.getDeviceUUID(context);
+        }
 
         //Encoding:
         byte[] buffer = new byte[4096];
@@ -79,6 +89,7 @@ public class AudioRecordManager {
 
         //Capture audio
         while (mRecorder != null) {
+            audioTimeStamp += 1;
             size = mRecorder.read(buffer, 0, buffer.length);
             //Log.d(LOG_TAG, "read: " + size);
 
@@ -89,7 +100,7 @@ public class AudioRecordManager {
             //Base64 encoding
             String strEncoded = Base64.encodeToString(outBuffer, 2);
 
-            AudioModel item = new AudioModel(strEncoded, size);
+            AudioModel item = new AudioModel(strEncoded, size, String.valueOf(audioTimeStamp), uuid);
             AudiosEndCoded.add(item);
         }
     }

@@ -110,7 +110,7 @@ public class MainActivity extends BaseActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                AudioRecordManager.startRecording();
+                AudioRecordManager.startRecording(MainActivity.this);
             }
         }).start();
 
