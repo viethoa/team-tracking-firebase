@@ -26,7 +26,7 @@ public class AudioRecordManager {
     private static AudioRecord mRecorder = null;
     private static AudioTrack mPlayer = null;
 
-    private static int sampleRate = 16000; //44100;
+    private static int sampleRate = 8000; //44100;
     private static int channelConfig = AudioFormat.CHANNEL_IN_MONO;
     private static int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
     private static int minBufSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat);
@@ -130,20 +130,15 @@ public class AudioRecordManager {
         if (readSize <= 0)
             return 0;
 
-//        Double sum = 0.0;
-//        for (int i = 0; i < readSize; i++) {
-//            sum += buffer [i] * buffer [i];
-//        }
-
-//        final double amplitude = sum / readSize;
-//        return (float) Math.sqrt(amplitude);
-
-        float sumLevel = 0;
-        for (int i = 0; i < readSize; i++) {
-            sumLevel += Math.abs(buffer[i]);
+        float max = 0;
+        for (int i = 0; i < readSize; i+=2) {
+            int intSample = (buffer[i+1] << 8) | (buffer[i]) & 0xFF;
+            float floatSample = intSample / 32767.0f;
+            floatSample = Math.abs(floatSample);
+            max = Math.max(floatSample, max);
         }
 
-        return Math.abs((sumLevel / readSize));
+        return max;
     }
 
     public static ArrayList<AudioModel> stopRecording() {

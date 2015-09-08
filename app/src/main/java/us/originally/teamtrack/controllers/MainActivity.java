@@ -98,7 +98,6 @@ public class MainActivity extends BaseActivity implements VisualizerView.Visuali
         if (event == null)
             return;
 
-        logDebug("amplitude: " + event.getSoudValue());
         mVisualizer.OnSpeaking(event.getSoudValue());
     }
 

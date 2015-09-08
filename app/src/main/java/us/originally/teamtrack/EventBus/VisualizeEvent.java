@@ -9,6 +9,7 @@ public class VisualizeEvent {
         this.soudValue = soudValue;
     }
 
+    //Value ranges from 0 to 1
     public float getSoudValue() {
         return soudValue;
     }
