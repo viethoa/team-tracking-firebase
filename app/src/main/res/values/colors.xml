@@ -23,5 +23,5 @@
     <color name="text_color_light">#FF999999</color>
     <color name="text_color_bright">#FFFFFFFF</color>
 
-
+    <color name="visualizer_dark">#EAEAEA</color>
 </resources>

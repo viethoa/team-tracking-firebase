@@ -13,6 +13,10 @@ import com.lorem_ipsum.utils.DeviceUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.greenrobot.event.EventBus;
+import us.originally.teamtrack.EventBus.AudioEvent;
+import us.originally.teamtrack.models.AudioData;
+
 /**
  * Created by VietHoa on 03/09/15.
  */
@@ -32,6 +36,13 @@ public class AudioRecordManager {
     private static int audioTimeStamp = 0;
     private static CMG711 uLawCodec = new CMG711();
     public static ArrayList<AudioModel> AudiosEndCoded;
+
+    private static boolean isRecording = false;
+    private static EventBus eventBus = new EventBus();
+
+    public static boolean isRecording() {
+        return mPlayer != null;
+    }
 
     //**********************************************************************************************
     //  Player
@@ -73,6 +84,7 @@ public class AudioRecordManager {
     public static void startRecording(Context context) {
         mRecorder = new AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, channelConfig, audioFormat, minBufSize * 10);
         mRecorder.startRecording();
+        isRecording = true;
 
         audioTimeStamp = 0;
         if (uuid == null) {
@@ -88,32 +100,36 @@ public class AudioRecordManager {
         AudiosEndCoded = new ArrayList<>();
 
         //Capture audio
-        while (mRecorder != null) {
+        while (mRecorder != null && isRecording) {
             audioTimeStamp += 1;
             size = mRecorder.read(buffer, 0, buffer.length);
-            //Log.d(LOG_TAG, "read: " + size);
+
+            //Take audio waveform
+            AudioData audioData = new AudioData(buffer, size);
+            eventBus.getDefault().post(new AudioEvent(audioData));
 
             //uLaw Encoding:
             uLawCodec.encode(buffer, 0, size, outBuffer);
-            //Log.d(LOG_TAG, "encode: " + encoded);
 
             //Base64 encoding
             String strEncoded = Base64.encodeToString(outBuffer, 2);
 
+            //Capture audio
             AudioModel item = new AudioModel(strEncoded, size, String.valueOf(audioTimeStamp), uuid);
             AudiosEndCoded.add(item);
         }
     }
 
     public static ArrayList<AudioModel> stopRecording() {
-        if (mRecorder == null || AudiosEndCoded == null)
-            return null;
-
-        mRecorder.stop();
-        mRecorder.release();
-        mRecorder = null;
+        if (mRecorder != null) {
+            mRecorder.stop();
+            mRecorder.release();
+        }
 
         Log.d(LOG_TAG, "encode: stop");
+        mRecorder = null;
+        isRecording = false;
+
         return AudiosEndCoded;
     }
 }

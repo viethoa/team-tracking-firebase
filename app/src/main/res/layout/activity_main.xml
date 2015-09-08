@@ -8,12 +8,12 @@
         android:id="@+id/my_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="50dp"/>
+        android:layout_marginBottom="45dp"/>
 
-    <Button
-        android:id="@+id/btn_speak"
+    <us.originally.teamtrack.customviews.VisualizerView
+        android:id="@+id/visualizer"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_alignParentBottom="true"
-        android:text="@string/str_speak"/>
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"/>
+
 </RelativeLayout>

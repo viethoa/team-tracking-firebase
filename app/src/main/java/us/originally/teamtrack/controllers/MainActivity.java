@@ -1,11 +1,8 @@
 package us.originally.teamtrack.controllers;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
-import android.widget.Button;
 
 import com.lorem_ipsum.activities.BaseActivity;
 
@@ -15,21 +12,23 @@ import java.util.Random;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import de.greenrobot.event.EventBus;
+import us.originally.teamtrack.EventBus.AudioEvent;
 import us.originally.teamtrack.EventBus.MessageEvent;
 import us.originally.teamtrack.R;
 import us.originally.teamtrack.adapters.ChattingAdapter;
+import us.originally.teamtrack.customviews.VisualizerView;
+import us.originally.teamtrack.models.AudioData;
 import us.originally.teamtrack.modules.chat.MessageModel;
 import us.originally.teamtrack.modules.chat.audio.AudioModel;
 import us.originally.teamtrack.modules.chat.audio.AudioRecordManager;
-import us.originally.teamtrack.modules.firebase.FireBaseAction;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements VisualizerView.VisualizerListener {
 
     private static final String CHANNEL_NAME = "temp_channel";
     protected LinearLayoutManager mLayoutManager;
 
-    @InjectView(R.id.btn_speak)
-    Button btnSpeak;
+    @InjectView(R.id.visualizer)
+    VisualizerView mVisualizer;
     @InjectView(R.id.my_recycler_view)
     RecyclerView mRecycleView;
 
@@ -43,7 +42,7 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
         eventBus = new EventBus();
-        FireBaseAction.registerEventListener(this, CHANNEL_NAME);
+        //FireBaseAction.registerEventListener(this, CHANNEL_NAME);
 
         initialiseData();
         initialiseUI();
@@ -76,14 +75,6 @@ public class MainActivity extends BaseActivity {
         mLayoutManager = new LinearLayoutManager(this);
         mRecycleView.setLayoutManager(mLayoutManager);
         mRecycleView.setAdapter(mAdapter);
-
-        //Capture audio
-        btnSpeak.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onSpeakClicked();
-            }
-        });
     }
 
     //----------------------------------------------------------------------------------------------
@@ -104,8 +95,28 @@ public class MainActivity extends BaseActivity {
         });
     }
 
-    protected void onSpeakClicked() {
-        btnSpeak.setText(R.string.str_recording);
+    public void onEventMainThread(AudioEvent event) {
+        logDebug("audio added");
+        if (event == null || event.getVisualizer() == null)
+            return;
+
+        AudioData audioData = event.getVisualizer();
+        if (audioData.size <= 0)
+            return;
+
+        double sum = 0;
+        for (int i = 0; i < audioData.size; i++) {
+            sum += audioData.bytes[i] * audioData.bytes[i];
+        }
+
+        final double amplitude = sum / audioData.size;
+        mVisualizer.OnSpeaking(audioData);
+    }
+
+    @Override
+    public void onEntered() {
+        if (AudioRecordManager.isRecording())
+            return;
 
         new Thread(new Runnable() {
             @Override
@@ -113,18 +124,10 @@ public class MainActivity extends BaseActivity {
                 AudioRecordManager.startRecording(MainActivity.this);
             }
         }).start();
-
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                recordStopped();
-            }
-        }, 10000);
     }
 
-    protected void recordStopped() {
-        btnSpeak.setText(R.string.str_speak);
-
+    @Override
+    public void onLeaved() {
         ArrayList<AudioModel> audio = AudioRecordManager.stopRecording();
         if (audio == null || audio.size() <= 0) {
             logError("Record error problem");
@@ -134,6 +137,7 @@ public class MainActivity extends BaseActivity {
         Random random = new Random();
         int id = random.nextInt(1000000);
         MessageModel message = new MessageModel(id, null, audio);
-        FireBaseAction.pushMessage(this, CHANNEL_NAME, message);
+
+        //FireBaseAction.pushMessage(this, CHANNEL_NAME, message);
     }
 }
