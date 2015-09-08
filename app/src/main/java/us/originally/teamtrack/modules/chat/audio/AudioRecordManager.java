@@ -50,7 +50,9 @@ public class AudioRecordManager {
 
     public static void startPlaying(List<AudioModel> AudiosEndCoded) {
         mPlayer = new AudioTrack(android.media.AudioManager.STREAM_MUSIC, sampleRate,
-                AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT, minBufSize,
+                AudioFormat.CHANNEL_CONFIGURATION_MONO,
+                AudioFormat.ENCODING_PCM_8BIT,
+                minBufSize,
                 AudioTrack.MODE_STREAM);
         mPlayer.play();
 

@@ -131,7 +131,7 @@ public class VisualizerView extends RelativeLayout {
 
         protected void onTouchEntered() {
             Resources res = getContext().getResources();
-            final int newColor = res.getColor(R.color.visualizer_dark);
+            final int newColor = res.getColor(R.color.text_color_dark);
             vBackground.setColorFilter(newColor);
 
             animationSpeaking(2f);
@@ -141,7 +141,7 @@ public class VisualizerView extends RelativeLayout {
         }
 
         protected void onTouchLeaved() {
-            btnSpeak.setColorFilter(null);
+            vBackground.setColorFilter(null);
             if (listener != null) {
                 listener.onLeaved();
             }
