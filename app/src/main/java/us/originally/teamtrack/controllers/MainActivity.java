@@ -20,7 +20,6 @@ import us.originally.teamtrack.customviews.VisualizerView;
 import us.originally.teamtrack.modules.chat.MessageModel;
 import us.originally.teamtrack.modules.chat.audio.AudioModel;
 import us.originally.teamtrack.modules.chat.audio.AudioRecordManager;
-import us.originally.teamtrack.modules.firebase.FireBaseAction;
 
 public class MainActivity extends BaseActivity implements VisualizerView.VisualizerListener {
 
@@ -42,7 +41,7 @@ public class MainActivity extends BaseActivity implements VisualizerView.Visuali
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
         eventBus = new EventBus();
-        FireBaseAction.registerEventListener(this, CHANNEL_NAME);
+        //FireBaseAction.registerEventListener(this, CHANNEL_NAME);
 
         initialiseData();
         initialiseUI();
@@ -128,6 +127,6 @@ public class MainActivity extends BaseActivity implements VisualizerView.Visuali
         int id = random.nextInt(1000000);
         MessageModel message = new MessageModel(id, null, audio);
 
-        FireBaseAction.pushMessage(this, CHANNEL_NAME, message);
+        //FireBaseAction.pushMessage(this, CHANNEL_NAME, message);
     }
 }
