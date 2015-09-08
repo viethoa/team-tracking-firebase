@@ -12,15 +12,15 @@ import java.util.Random;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import de.greenrobot.event.EventBus;
-import us.originally.teamtrack.EventBus.AudioEvent;
 import us.originally.teamtrack.EventBus.MessageEvent;
+import us.originally.teamtrack.EventBus.VisualizeEvent;
 import us.originally.teamtrack.R;
 import us.originally.teamtrack.adapters.ChattingAdapter;
 import us.originally.teamtrack.customviews.VisualizerView;
-import us.originally.teamtrack.models.AudioData;
 import us.originally.teamtrack.modules.chat.MessageModel;
 import us.originally.teamtrack.modules.chat.audio.AudioModel;
 import us.originally.teamtrack.modules.chat.audio.AudioRecordManager;
+import us.originally.teamtrack.modules.firebase.FireBaseAction;
 
 public class MainActivity extends BaseActivity implements VisualizerView.VisualizerListener {
 
@@ -42,7 +42,7 @@ public class MainActivity extends BaseActivity implements VisualizerView.Visuali
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
         eventBus = new EventBus();
-        //FireBaseAction.registerEventListener(this, CHANNEL_NAME);
+        FireBaseAction.registerEventListener(this, CHANNEL_NAME);
 
         initialiseData();
         initialiseUI();
@@ -95,22 +95,12 @@ public class MainActivity extends BaseActivity implements VisualizerView.Visuali
         });
     }
 
-    public void onEventMainThread(AudioEvent event) {
-        logDebug("audio added");
-        if (event == null || event.getVisualizer() == null)
+    public void onEventMainThread(VisualizeEvent event) {
+        if (event == null)
             return;
 
-        AudioData audioData = event.getVisualizer();
-        if (audioData.size <= 0)
-            return;
-
-        double sum = 0;
-        for (int i = 0; i < audioData.size; i++) {
-            sum += audioData.bytes[i] * audioData.bytes[i];
-        }
-
-        final double amplitude = sum / audioData.size;
-        mVisualizer.OnSpeaking(audioData);
+        logDebug("amplitude: " + event.getSoudValue());
+        mVisualizer.OnSpeaking(event.getSoudValue());
     }
 
     @Override
@@ -138,6 +128,6 @@ public class MainActivity extends BaseActivity implements VisualizerView.Visuali
         int id = random.nextInt(1000000);
         MessageModel message = new MessageModel(id, null, audio);
 
-        //FireBaseAction.pushMessage(this, CHANNEL_NAME, message);
+        FireBaseAction.pushMessage(this, CHANNEL_NAME, message);
     }
 }

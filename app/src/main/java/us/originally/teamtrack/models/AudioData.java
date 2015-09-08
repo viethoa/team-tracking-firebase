@@ -6,10 +6,10 @@ package us.originally.teamtrack.models;
 public class AudioData {
 
     public AudioData(byte[] bytes, int size) {
-        this.bytes = bytes;
+        this.buffer = bytes;
         this.size = size;
     }
 
-    public byte[] bytes;
+    public byte[] buffer;
     public int size;
 }

@@ -17,16 +17,19 @@ import java.util.Calendar;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import us.originally.teamtrack.R;
-import us.originally.teamtrack.models.AudioData;
 
 /**
  * Created by VietHoa on 08/09/15.
  */
 public class VisualizerView extends RelativeLayout {
     private static final String TAG = "Visualize";
-    private static final int DUARATION = 200;
 
+    private static final int DURATION = 200;
+    private static final float MAX_SCALE = 2.5f;
+    private static final float MIN_SCALE = 1.3f;
+    private static final float NORMAL_SCALE = 1f;
     protected VisualizerListener listener;
+    protected boolean isStopRecording;
 
     @InjectView(R.id.btn_speak)
     ImageView btnSpeak;
@@ -73,27 +76,35 @@ public class VisualizerView extends RelativeLayout {
     // Event
     //----------------------------------------------------------------------------------------------
 
-    public void OnSpeaking(AudioData buffer) {
+    public void OnSpeaking(float soundLevel) {
+        if (isStopRecording)
+            return;
 
+        if (soundLevel > MAX_SCALE)
+            soundLevel = MAX_SCALE;
+        if (soundLevel < MIN_SCALE)
+            soundLevel = MIN_SCALE;
+
+        vAnimationSpeaking.setScaleX(soundLevel);
+        vAnimationSpeaking.setScaleY(soundLevel);
     }
 
     protected void animationSpeaking(float scale) {
         vAnimationSpeaking.setScaleX(0.5f);
         vAnimationSpeaking.setScaleY(0.5f);
-
-        vAnimationSpeaking.animate().scaleX(scale).setDuration(DUARATION).start();
-        vAnimationSpeaking.animate().scaleY(scale).setDuration(DUARATION).start();
+        vAnimationSpeaking.animate().scaleX(scale).setDuration(DURATION).start();
+        vAnimationSpeaking.animate().scaleY(scale).setDuration(DURATION).start();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 animationDone();
             }
-        }, DUARATION);
+        }, DURATION);
     }
 
     protected void animationDone() {
-        vAnimationSpeaking.animate().scaleX(1f).setDuration(DUARATION).start();
-        vAnimationSpeaking.animate().scaleY(1f).setDuration(DUARATION).start();
+        vAnimationSpeaking.animate().scaleX(MIN_SCALE).setDuration(DURATION).start();
+        vAnimationSpeaking.animate().scaleY(MIN_SCALE).setDuration(DURATION).start();
     }
 
     protected class VisualizeTouchEvent implements OnTouchListener {
@@ -134,6 +145,7 @@ public class VisualizerView extends RelativeLayout {
             final int newColor = res.getColor(R.color.visualizer_dark);
             vBackground.setColorFilter(newColor);
 
+            isStopRecording = false;
             animationSpeaking(2f);
             if (listener != null) {
                 listener.onEntered();
@@ -142,6 +154,10 @@ public class VisualizerView extends RelativeLayout {
 
         protected void onTouchLeaved() {
             vBackground.setColorFilter(null);
+            vAnimationSpeaking.setScaleX(NORMAL_SCALE);
+            vAnimationSpeaking.setScaleY(NORMAL_SCALE);
+            isStopRecording = true;
+
             if (listener != null) {
                 listener.onLeaved();
             }

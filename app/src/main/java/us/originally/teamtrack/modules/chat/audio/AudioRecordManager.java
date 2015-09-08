@@ -14,8 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
-import us.originally.teamtrack.EventBus.AudioEvent;
-import us.originally.teamtrack.models.AudioData;
+import us.originally.teamtrack.EventBus.VisualizeEvent;
 
 /**
  * Created by VietHoa on 03/09/15.
@@ -27,7 +26,7 @@ public class AudioRecordManager {
     private static AudioRecord mRecorder = null;
     private static AudioTrack mPlayer = null;
 
-    private static int sampleRate = 8000; //44100;
+    private static int sampleRate = 16000; //44100;
     private static int channelConfig = AudioFormat.CHANNEL_IN_MONO;
     private static int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
     private static int minBufSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat);
@@ -49,9 +48,10 @@ public class AudioRecordManager {
     //**********************************************************************************************
 
     public static void startPlaying(List<AudioModel> AudiosEndCoded) {
-        mPlayer = new AudioTrack(android.media.AudioManager.STREAM_MUSIC, sampleRate,
+        mPlayer = new AudioTrack(android.media.AudioManager.STREAM_MUSIC,
+                sampleRate,
                 AudioFormat.CHANNEL_CONFIGURATION_MONO,
-                AudioFormat.ENCODING_PCM_8BIT,
+                audioFormat,
                 minBufSize,
                 AudioTrack.MODE_STREAM);
         mPlayer.play();
@@ -84,18 +84,22 @@ public class AudioRecordManager {
     //**********************************************************************************************
 
     public static void startRecording(Context context) {
-        mRecorder = new AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, channelConfig, audioFormat, minBufSize * 10);
+        mRecorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
+                sampleRate,
+                channelConfig,
+                audioFormat,
+                minBufSize * 10);
         mRecorder.startRecording();
-        isRecording = true;
 
+        isRecording = true;
         audioTimeStamp = 0;
         if (uuid == null) {
             uuid = DeviceUtils.getDeviceUUID(context);
         }
 
         //Encoding:
-        byte[] buffer = new byte[4096];
-        byte[] outBuffer = new byte[4096];
+        byte[] buffer = new byte[3072];
+        byte[] outBuffer = new byte[3072];
         int size;
 
         //Audio byte store
@@ -107,8 +111,8 @@ public class AudioRecordManager {
             size = mRecorder.read(buffer, 0, buffer.length);
 
             //Take audio waveform
-            AudioData audioData = new AudioData(buffer, size);
-            eventBus.getDefault().post(new AudioEvent(audioData));
+            float soundValue = calculatePowerDb(buffer, size);
+            eventBus.getDefault().post(new VisualizeEvent(soundValue));
 
             //uLaw Encoding:
             uLawCodec.encode(buffer, 0, size, outBuffer);
@@ -120,6 +124,26 @@ public class AudioRecordManager {
             AudioModel item = new AudioModel(strEncoded, size, String.valueOf(audioTimeStamp), uuid);
             AudiosEndCoded.add(item);
         }
+    }
+
+    protected static float calculatePowerDb(byte[] buffer, int readSize) {
+        if (readSize <= 0)
+            return 0;
+
+//        Double sum = 0.0;
+//        for (int i = 0; i < readSize; i++) {
+//            sum += buffer [i] * buffer [i];
+//        }
+
+//        final double amplitude = sum / readSize;
+//        return (float) Math.sqrt(amplitude);
+
+        float sumLevel = 0;
+        for (int i = 0; i < readSize; i++) {
+            sumLevel += Math.abs(buffer[i]);
+        }
+
+        return Math.abs((sumLevel / readSize));
     }
 
     public static ArrayList<AudioModel> stopRecording() {
