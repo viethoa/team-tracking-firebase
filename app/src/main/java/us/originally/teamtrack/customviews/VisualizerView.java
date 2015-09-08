@@ -80,13 +80,19 @@ public class VisualizerView extends RelativeLayout {
         if (isStopRecording)
             return;
 
-        if (soundLevel > MAX_SCALE)
-            soundLevel = MAX_SCALE;
-        if (soundLevel < MIN_SCALE)
-            soundLevel = MIN_SCALE;
+        float scale = convertToScaleSize(soundLevel);
+        vAnimationSpeaking.setScaleX(scale);
+        vAnimationSpeaking.setScaleY(scale);
+    }
 
-        vAnimationSpeaking.setScaleX(soundLevel);
-        vAnimationSpeaking.setScaleY(soundLevel);
+    protected float convertToScaleSize(float soundValue) {
+        if (soundValue == 0)
+            return MIN_SCALE;
+        if (soundValue == 1)
+            return MAX_SCALE;
+
+        float percent = (MAX_SCALE - MIN_SCALE) / 10;
+        return (percent * soundValue * 10) + 1.3f;
     }
 
     protected void animationSpeaking(float scale) {
@@ -106,6 +112,10 @@ public class VisualizerView extends RelativeLayout {
         vAnimationSpeaking.animate().scaleX(MIN_SCALE).setDuration(DURATION).start();
         vAnimationSpeaking.animate().scaleY(MIN_SCALE).setDuration(DURATION).start();
     }
+
+    //----------------------------------------------------------------------------------------------
+    // Touch listener
+    //----------------------------------------------------------------------------------------------
 
     protected class VisualizeTouchEvent implements OnTouchListener {
         private static final int MIN_CLICK_DURATION = 100;
