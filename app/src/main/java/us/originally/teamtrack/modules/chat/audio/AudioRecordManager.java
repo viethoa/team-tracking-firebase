@@ -26,10 +26,11 @@ public class AudioRecordManager {
     private static AudioRecord mRecorder = null;
     private static AudioTrack mPlayer = null;
 
-    private static int sampleRate = 8000; //44100;
+    private static int sampleRate = 8000;
     private static int channelConfig = AudioFormat.CHANNEL_IN_MONO;
     private static int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
     private static int minBufSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat);
+    private static int bufferSize = 4096;
 
     private static String uuid = null;
     private static int audioTimeStamp = 0;
@@ -98,8 +99,8 @@ public class AudioRecordManager {
         }
 
         //Encoding:
-        byte[] buffer = new byte[3072];
-        byte[] outBuffer = new byte[3072];
+        byte[] buffer = new byte[bufferSize];
+        byte[] outBuffer = new byte[bufferSize];
         int size;
 
         //Audio byte store
