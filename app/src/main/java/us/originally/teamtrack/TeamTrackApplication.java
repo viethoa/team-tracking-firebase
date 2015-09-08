@@ -21,6 +21,7 @@ public class TeamTrackApplication extends AppUtils {
         try {
             final String device_uuid = DeviceUtils.getDeviceUUID(getAppContext());
             Parse.enableLocalDatastore(this);
+            Parse.initialize(getAppContext(), getString(R.string.parse_app_id), getString(R.string.parse_client_key));
             ParseInstallation currentInstall = ParseInstallation.getCurrentInstallation();
             currentInstall.put("device_uuid", device_uuid);
             currentInstall.saveInBackground();
