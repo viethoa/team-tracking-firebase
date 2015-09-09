@@ -99,8 +99,9 @@ public class AudioRecordManager {
         }
 
         //Encoding:
-        byte[] buffer = new byte[bufferSize];
-        byte[] outBuffer = new byte[bufferSize];
+        Log.d(LOG_TAG, String.valueOf(minBufSize));
+        byte[] buffer = new byte[minBufSize];
+        byte[] outBuffer = new byte[minBufSize];
         int size;
 
         //Audio byte store
@@ -143,14 +144,14 @@ public class AudioRecordManager {
     }
 
     public static ArrayList<AudioModel> stopRecording() {
+        isRecording = false;
         if (mRecorder != null) {
             mRecorder.stop();
             mRecorder.release();
         }
 
-        Log.d(LOG_TAG, "encode: stop");
         mRecorder = null;
-        isRecording = false;
+        Log.d(LOG_TAG, "encode: stop");
 
         return AudiosEndCoded;
     }

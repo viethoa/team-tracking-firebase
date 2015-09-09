@@ -95,17 +95,17 @@ public class VisualizerView extends RelativeLayout {
         return (percent * soundValue * 10) + 1.3f;
     }
 
-    protected void animationSpeaking(float scale) {
+    protected void animationSpeaking(float scale, int duration) {
         vAnimationSpeaking.setScaleX(0.5f);
         vAnimationSpeaking.setScaleY(0.5f);
-        vAnimationSpeaking.animate().scaleX(scale).setDuration(DURATION).start();
-        vAnimationSpeaking.animate().scaleY(scale).setDuration(DURATION).start();
+        vAnimationSpeaking.animate().scaleX(scale).setDuration(duration).start();
+        vAnimationSpeaking.animate().scaleY(scale).setDuration(duration).start();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 animationDone();
             }
-        }, DURATION);
+        }, duration);
     }
 
     protected void animationDone() {
@@ -126,7 +126,6 @@ public class VisualizerView extends RelativeLayout {
         public boolean onTouch(View view, MotionEvent e) {
             switch (e.getAction()) {
                 case MotionEvent.ACTION_DOWN:
-                    Log.d(TAG, "touch down");
                     isTouching = false;
                     startClickTime = Calendar.getInstance().getTimeInMillis();
                     break;
@@ -134,6 +133,7 @@ public class VisualizerView extends RelativeLayout {
                 case MotionEvent.ACTION_MOVE:
                     long clickDuration = Calendar.getInstance().getTimeInMillis() - startClickTime;
                     if (clickDuration >= MIN_CLICK_DURATION && !isTouching) {
+                        Log.d(TAG, "touch down");
                         onTouchEntered();
                         isTouching = true;
                     }
@@ -151,26 +151,26 @@ public class VisualizerView extends RelativeLayout {
         }
 
         protected void onTouchEntered() {
+            if (listener != null) {
+                listener.onEntered();
+            }
+
             Resources res = getContext().getResources();
             final int newColor = res.getColor(R.color.visualizer_dark);
             vBackground.setColorFilter(newColor);
 
             isStopRecording = false;
-            animationSpeaking(2f);
-            if (listener != null) {
-                listener.onEntered();
-            }
+            animationSpeaking(2f, DURATION);
         }
 
         protected void onTouchLeaved() {
-            vBackground.setColorFilter(null);
-            vAnimationSpeaking.setScaleX(NORMAL_SCALE);
-            vAnimationSpeaking.setScaleY(NORMAL_SCALE);
-            isStopRecording = true;
-
             if (listener != null) {
                 listener.onLeaved();
             }
+
+            isStopRecording = true;
+            vBackground.setColorFilter(null);
+            animationSpeaking(NORMAL_SCALE, 50);
         }
     }
 }

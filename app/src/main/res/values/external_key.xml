@@ -18,4 +18,7 @@
 
     <!-- FireBase -->
     <string name="firebase_ref">https://originallyteamtrack.firebaseio.com/</string>
+
+    <!-- Maps -->
+    <string name="google_maps_key">AIzaSyA2FmS_deip7SRzN6rUj0HbYl5z2VKqQ3c</string>
 </resources>

@@ -6,4 +6,12 @@
     <string name="str_speak">Speak</string>
     <string name="title_activity_audio_stream">AudioStreamActivity</string>
     <string name="str_subscribe">Subscribe</string>
+    <string name="title_activity_landing">LandingActivity</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="str_app_title">TEAM TRACK</string>
+    <string name="dialog_gps_title">GPS not on Leh!</string>
+    <string name="dialog_gps_message">You need to turn on your GPS to detect nearby bus-stops!</string>
+    <string name="dialog_gps_negative_btn">SKIP</string>
+    <string name="dialog_gps_positive_btn">SETTING</string>
+    <string name="title_activity_login">LoginActivity</string>
 </resources>

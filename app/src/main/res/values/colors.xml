@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="app_primary_color">#F44336</color>
-    <color name="app_primary_color_dark">#c31c13</color>
-    <color name="tabs_scroll_color">#B71C1C</color>
+    <color name="app_primary_color">#3F51B5</color>
+    <color name="app_primary_color_dark">#303F9F</color>
+    <color name="tabs_scroll_color">#3F51B5</color>
 
     <color name="app_highlight_color">#BDBDBD</color>
     <color name="app_effect_color_light">#f6f6f6</color>

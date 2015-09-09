@@ -41,6 +41,17 @@ android {
 }
 
 dependencies {
+    compile('com.firebase:firebase-client-android:2.3.1') {
+        exclude group: 'org.apache.httpcomponents', module: 'httpclient'
+    }
+    compile project(':libraries:CustomDialog')
+    compile project(':libraries:LoremIpsumLib')
+    compile fileTree(
+            dir: 'libs',
+            excludes: ['android-support-v4.jar', 'android-support-v13.jar', 'android-support-v7-appcompat.jar'],
+            include: ['*.jar']
+    )
+    compile 'com.android.support:design:23.0.1'
     compile 'com.android.support:support-v4:23.0.1'
     compile 'com.android.support:appcompat-v7:23.0.1'
     compile 'com.android.support:recyclerview-v7:23.0.1'
@@ -49,13 +60,5 @@ dependencies {
     compile 'com.parse.bolts:bolts-android:1.2.1'
     compile 'com.parse:parse-android:1.10.1'
     compile 'com.android.support:multidex:1.0.1'
-    compile('com.firebase:firebase-client-android:2.3.1') {
-        exclude group: 'org.apache.httpcomponents', module: 'httpclient'
-    }
-    compile project(':libraries:LoremIpsumLib')
-    compile fileTree (
-            dir: 'libs',
-            excludes: ['android-support-v4.jar', 'android-support-v13.jar', 'android-support-v7-appcompat.jar'],
-            include: ['*.jar']
-    )
+    compile 'com.google.android.gms:play-services:7.8.0'
 }

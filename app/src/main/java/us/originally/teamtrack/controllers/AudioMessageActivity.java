@@ -21,7 +21,7 @@ import us.originally.teamtrack.modules.chat.MessageModel;
 import us.originally.teamtrack.modules.chat.audio.AudioModel;
 import us.originally.teamtrack.modules.chat.audio.AudioRecordManager;
 
-public class MainActivity extends BaseActivity implements VisualizerView.VisualizerListener {
+public class AudioMessageActivity extends BaseActivity implements VisualizerView.VisualizerListener {
 
     private static final String CHANNEL_NAME = "temp_channel";
     protected LinearLayoutManager mLayoutManager;
@@ -110,7 +110,7 @@ public class MainActivity extends BaseActivity implements VisualizerView.Visuali
         new Thread(new Runnable() {
             @Override
             public void run() {
-                AudioRecordManager.startRecording(MainActivity.this);
+                AudioRecordManager.startRecording(AudioMessageActivity.this);
             }
         }).start();
     }

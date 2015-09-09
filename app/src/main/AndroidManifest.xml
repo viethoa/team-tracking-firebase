@@ -2,8 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="us.originally.teamtrack" >
 
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
@@ -11,12 +12,26 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
 
     <!-- Parse -->
     <uses-permission android:name="us.originally.teamtrack.permission.C2D_MESSAGE" />
 
     <permission
         android:name="us.originally.teamtrack.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
+    <!-- Google Maps Android API v2 -->
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true" />
+
+    <uses-permission android:name="us.originally.teamtrack.permission.MAPS_RECEIVE" />
+
+    <permission
+        android:name="us.originally.teamtrack.permission.MAPS_RECEIVE"
         android:protectionLevel="signature" />
 
     <application
@@ -26,7 +41,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
 
-        <!-- ==================== start PARSE - REQUIRED ENTRIES ==================== -->
+        <!-- ==================== start PARSE - REQUIRED ENTRIES ======================== -->
         <meta-data
             android:name="com.parse.APPLICATION_ID"
             android:value="@string/parse_app_id" />
@@ -36,10 +51,19 @@
         <meta-data
             android:name="com.parse.push.notification_icon"
             android:resource="@mipmap/ic_launcher" />
-        <!-- ==================== end PARSE - REQUIRED ENTRIES ==================== -->
+        <!-- ==================== end PARSE - REQUIRED ENTRIES ========================== -->
+
+
+        <!-- ==================== start GOOGLE MAPS - REQUIRED ENTRIES ================== -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
+
+        <uses-library android:name="com.google.android.maps" />
+        <!-- ==================== end GOOGLE MAPS - REQUIRED ENTRIES ==================== -->
 
         <activity
-            android:name=".controllers.MainActivity"
+            android:name=".controllers.LandingActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" >
             <intent-filter>
@@ -52,9 +76,12 @@
             android:name=".controllers.AudioStreamActivity"
             android:label="@string/title_activity_audio_stream" >
         </activity>
+        <activity
+            android:name=".controllers.AudioMessageActivity"
+            android:label="@string/title_activity_landing" >
+        </activity>
 
         <service android:name=".services.AudioService" />
-
         <!-- Parse push notification -->
         <service android:name="com.parse.PushService" />
 
@@ -83,15 +110,11 @@
                 <category android:name="us.originally.teamtrack" />
             </intent-filter>
         </receiver>
-        <!-- <receiver -->
-        <!-- android:name=".modules.Parse.ParseNotificationReceiver" -->
-        <!-- android:exported="false" > -->
-        <!-- <intent-filter> -->
-        <!-- <action android:name="com.parse.push.intent.RECEIVE" /> -->
-        <!-- <action android:name="com.parse.push.intent.OPEN" /> -->
-        <!-- <action android:name="com.parse.push.intent.DELETE" /> -->
-        <!-- </intent-filter> -->
-        <!-- </receiver> -->
+
+        <activity
+            android:name=".controllers.LoginActivity"
+            android:label="@string/title_activity_login" >
+        </activity>
     </application>
 
 </manifest>
