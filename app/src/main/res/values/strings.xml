@@ -15,4 +15,7 @@
     <string name="dialog_gps_positive_btn">SETTING</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="title_activity_main">MainActivity</string>
+    <string name="str_login_valid_name">Please enter your name !</string>
+    <string name="str_login_valid_team">Please enter your team name !</string>
+    <string name="str_login_valid_password">What is your password?</string>
 </resources>

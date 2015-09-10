@@ -24,6 +24,21 @@
         <item name="android:gravity">center</item>
     </style>
 
+    <!-- Edit text -->
+    <style name="login_edit_text_style">
+        <item name="android:layout_marginLeft">@dimen/large_space</item>
+        <item name="android:layout_marginRight">@dimen/large_space</item>
+    </style>
+
+    <style name="edit_text_view">
+        <item name="android:background">@color/text_color_bright</item>
+        <item name="android:paddingLeft">@dimen/medium_space</item>
+        <item name="android:paddingRight">@dimen/medium_space</item>
+        <item name="android:paddingTop">@dimen/medium_space</item>
+        <item name="android:paddingBottom">@dimen/medium_space</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
     <!-- App dialog style-->
     <style name="dialog_title" parent="ThemeOverlay.AppCompat.Light">
         <item name="android:textColor">@color/app_primary_color</item>

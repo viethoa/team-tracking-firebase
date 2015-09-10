@@ -14,6 +14,8 @@ import com.lorem_ipsum.utils.StringUtils;
 import de.greenrobot.event.EventBus;
 import us.originally.teamtrack.EventBus.MessageEvent;
 import us.originally.teamtrack.R;
+import us.originally.teamtrack.models.TeamModel;
+import us.originally.teamtrack.models.TeamUser;
 import us.originally.teamtrack.modules.chat.MessageModel;
 import us.originally.teamtrack.modules.chat.audio.AudioModel;
 import us.originally.teamtrack.modules.chat.audio.AudioStreamManager;
@@ -25,6 +27,7 @@ import us.originally.teamtrack.modules.chat.audio.AudioStreamManager;
 public class FireBaseAction {
 
     protected static String TAG = "ChattingAction";
+    protected static String TEAM_GROUP = "Team_Group";
     protected static String myUUID = null;
 
     protected static EventBus eventBus;
@@ -106,7 +109,85 @@ public class FireBaseAction {
     }
 
     //----------------------------------------------------------------------------------------------
+    // Login section
+    //----------------------------------------------------------------------------------------------
+
+    public static boolean takeLoginOrSubscribe(Context context, TeamModel teamModel, TeamUser teamUser) {
+        if (teamModel == null || StringUtils.isNull(teamModel.team_name))
+            return false;
+
+        Firebase ref = getFirebaseRef(context);
+        if (ref == null)
+            return false;
+
+        if (isTeamExist(context, teamModel)) {
+            boolean isPasswordCorrect = validPassword(context, teamModel, teamUser);
+            if (isPasswordCorrect)
+                addTeamUser(context, teamModel, teamUser);
+            return isPasswordCorrect;
+        }
+
+        ref.child(TEAM_GROUP).child(teamModel.team_name).setValue(teamModel, new Firebase.CompletionListener() {
+            @Override
+            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                if (firebaseError != null) {
+                    Log.e(TAG, "FireBase Team could not be saved. " + firebaseError.getMessage());
+                } else {
+                    Log.d(TAG, "FireBase Team saved successfully.");
+                }
+            }
+        });
+
+        addTeamUser(context, teamModel, teamUser);
+        return true;
+    }
+
+    protected static boolean validPassword(Context context, TeamModel teamModel, TeamUser teamUser) {
+        if (teamModel == null || StringUtils.isNull(teamModel.team_name) || StringUtils.isNull(teamModel.password))
+            return false;
+
+        Firebase ref = getFirebaseRef(context);
+        if (ref == null)
+            return false;
+
+        Query myTeam = ref.child(TEAM_GROUP).child(teamModel.team_name);
+        return myTeam.equals(teamModel.password);
+    }
+
+    protected static void addTeamUser(Context context, TeamModel teamModel, TeamUser teamUser) {
+        Firebase ref = getFirebaseRef(context);
+        if (ref == null)
+            return;
+
+        String userId = teamUser.name + "_" + teamUser.device_uuid;
+        ref.child(TEAM_GROUP).child(teamModel.team_name).child(userId)
+                .setValue(teamUser, new Firebase.CompletionListener() {
+                    @Override
+                    public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                        if (firebaseError != null) {
+                            Log.e(TAG, "FireBase TeamUser could not be saved. " + firebaseError.getMessage());
+                        } else {
+                            Log.d(TAG, "FireBase TeamUser saved successfully.");
+                        }
+                    }
+                });
+    }
+
+    protected static boolean isTeamExist(Context context, TeamModel teamModel) {
+        if (teamModel == null || StringUtils.isNull(teamModel.team_name))
+            return false;
+
+        Firebase ref = getFirebaseRef(context);
+        if (ref == null)
+            return false;
+
+        Query teamGroup = ref.child(TEAM_GROUP);
+        return teamGroup.equals(teamModel.team_name);
+    }
+
+    //----------------------------------------------------------------------------------------------
     // Audio message section
+    //----------------------------------------------------------------------------------------------
 
     public static void pushMessage(Context context, String channelName, final MessageModel message) {
         if (!isMessageValid(message))
@@ -159,6 +240,7 @@ public class FireBaseAction {
 
     //----------------------------------------------------------------------------------------------
     // Stream section
+    //----------------------------------------------------------------------------------------------
 
     public static void pushAudio(Context context, String channelName, AudioModel audioModel) {
         if (!isAudioValid(audioModel))
