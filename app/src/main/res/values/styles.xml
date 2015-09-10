@@ -4,10 +4,10 @@
     <style name="AppTheme" parent="Base.AppTheme"></style>
 
     <style name="Application_Theme" parent="Base.AppTheme">
-        <item name="android:windowBackground">@color/app_primary_color</item>
+        <item name="android:windowBackground">@color/text_color_bright</item>
     </style>
 
-    <style name="Base.AppTheme" parent="Theme.AppCompat.NoActionBar">
+    <style name="Base.AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/app_primary_color</item>
         <item name="colorPrimaryDark">@color/app_primary_color_dark</item>
         <item name="colorAccent">@color/app_primary_color</item>
@@ -46,4 +46,63 @@
         <!--<item name="android:background">@drawable/dialog_button_positive</item>-->
         <item name="android:textAllCaps">true</item>
     </style>
+
+    <style name="TextInputLayout.Style" parent="@android:style/TextAppearance">
+        <item name="android:textColor">@color/app_teal_color</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <!-- App text view style -->
+    <style name="text_view_black_medium">
+        <item name="android:textColor">@color/text_color_black</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
+    </style>
+    <style name="text_view_black_small">
+        <item name="android:textColor">@color/text_color_black</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceSmall</item>
+    </style>
+    <style name="text_view_black_large">
+        <item name="android:textColor">@color/text_color_black</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceLarge</item>
+    </style>
+
+    <style name="text_view_dark_medium">
+        <item name="android:textColor">@color/text_color_dark</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
+    </style>
+    <style name="text_view_dark_small">
+        <item name="android:textColor">@color/text_color_dark</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceSmall</item>
+    </style>
+    <style name="text_view_dark_large">
+        <item name="android:textColor">@color/text_color_dark</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceLarge</item>
+    </style>
+
+    <style name="text_view_light_medium">
+        <item name="android:textColor">@color/text_color_light</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
+    </style>
+    <style name="text_view_light_small">
+        <item name="android:textColor">@color/text_color_light</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceSmall</item>
+    </style>
+    <style name="text_view_light_large">
+        <item name="android:textColor">@color/text_color_light</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceLarge</item>
+    </style>
+
+    <style name="text_view_bright_large">
+        <item name="android:textColor">@color/text_color_bright</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceLarge</item>
+    </style>
+    <style name="text_view_bright_medium">
+        <item name="android:textColor">@color/text_color_bright</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
+    </style>
+    <style name="text_view_bright_small">
+        <item name="android:textColor">@color/text_color_bright</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceSmall</item>
+    </style>
+
 </resources>

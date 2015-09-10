@@ -8,16 +8,18 @@
     <dimen name="xlarge_space">20dp</dimen>
     <dimen name="xxlarge_space">25dp</dimen>
 
-    <dimen name="font_small">14dp</dimen>
-    <dimen name="font_medium">18dp</dimen>
-    <dimen name="font_large">22dp</dimen>
-    <dimen name="font_no_data_view">16dp</dimen>
+    <dimen name="font_small">14sp</dimen>
+    <dimen name="font_medium">18sp</dimen>
+    <dimen name="font_large">22sp</dimen>
+    <dimen name="font_no_data_view">16sp</dimen>
 
     <dimen name="no_data_view_margin">60dp</dimen>
 
     <!-- toolbar -->
     <dimen name="toolbar_height">52dp</dimen>
-    <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <!-- main activity -->
+    <dimen name="footer_height">48dp</dimen>
+    <dimen name="chatting_view_margin_bottom">40dp</dimen>
+    <dimen name="chatting_view_margin_top">100dp</dimen>
 </resources>

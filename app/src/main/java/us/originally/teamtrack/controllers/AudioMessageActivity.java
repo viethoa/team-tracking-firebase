@@ -38,7 +38,7 @@ public class AudioMessageActivity extends BaseActivity implements VisualizerView
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_message_recoding);
         ButterKnife.inject(this);
         eventBus = new EventBus();
         //FireBaseAction.registerEventListener(this, CHANNEL_NAME);
@@ -74,6 +74,9 @@ public class AudioMessageActivity extends BaseActivity implements VisualizerView
         mLayoutManager = new LinearLayoutManager(this);
         mRecycleView.setLayoutManager(mLayoutManager);
         mRecycleView.setAdapter(mAdapter);
+
+        //Audio Visualizer
+        mVisualizer.setOnSpeakListener(this);
     }
 
     //----------------------------------------------------------------------------------------------

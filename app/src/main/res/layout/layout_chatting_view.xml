@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <View
+        android:id="@+id/header_box"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/chatting_view_margin_top"
+        android:background="@color/transparent"/>
+
+    <View
+        android:id="@+id/chat_header"
+        android:layout_below="@id/header_box"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:background="@drawable/chat_header_bg"/>
+
+    <ImageView
+        android:id="@+id/btn_close"
+        android:layout_width="40dp"
+        android:layout_height="30dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="@dimen/chatting_view_margin_top"
+        android:scaleType="centerInside"
+        android:src="@mipmap/ic_arrow_down"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/my_recycler_view"
+        android:layout_below="@id/chat_header"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="-1dp"
+        android:layout_marginBottom="@dimen/chatting_view_margin_bottom"
+        android:background="@color/app_effect_color_light"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_height="@dimen/chatting_view_margin_bottom"
+        android:gravity="center_vertical">
+
+        <EditText
+            android:id="@+id/et_comment"
+            android:layout_width="@dimen/empty_space"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:lines="1"
+            android:maxLines="1"
+            android:inputType="textPersonName"
+            android:padding="@dimen/small_space"
+            android:background="@color/text_color_bright"/>
+
+        <Button
+            android:id="@+id/btn_comment"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:textColor="@color/text_color_bright"
+            android:background="@color/app_orange_color"
+            android:text="send"/>
+    </LinearLayout>
+</RelativeLayout>

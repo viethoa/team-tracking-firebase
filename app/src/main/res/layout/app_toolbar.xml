@@ -14,6 +14,7 @@
 
         <TextView
             android:id="@+id/tv_app_title"
+            style="@style/text_view_bright_large"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
@@ -27,7 +28,7 @@
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:padding="@dimen/medium_space"
+            android:padding="@dimen/large_space"
             android:scaleType="centerInside"
             android:src="@mipmap/ic_add_team"/>
     </RelativeLayout>

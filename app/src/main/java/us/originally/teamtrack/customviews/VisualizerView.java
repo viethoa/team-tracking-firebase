@@ -63,7 +63,6 @@ public class VisualizerView extends RelativeLayout {
         View.inflate(context, R.layout.layout_visualize_view, this);
         ButterKnife.inject(this);
 
-        listener = (VisualizerListener) context;
         btnSpeak.setOnTouchListener(new VisualizeTouchEvent());
     }
 
@@ -75,6 +74,10 @@ public class VisualizerView extends RelativeLayout {
     //----------------------------------------------------------------------------------------------
     // Event
     //----------------------------------------------------------------------------------------------
+
+    public void setOnSpeakListener(VisualizerListener listener) {
+        this.listener = listener;
+    }
 
     public void OnSpeaking(float soundLevel) {
         if (isStopRecording)
