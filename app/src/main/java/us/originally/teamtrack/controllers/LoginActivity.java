@@ -3,6 +3,8 @@ package us.originally.teamtrack.controllers;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
+import android.view.View;
 import android.widget.EditText;
 
 import com.lorem_ipsum.utils.AnimationUtils;
@@ -52,7 +54,15 @@ public class LoginActivity extends BaseLoginActivity {
     }
 
     protected void initialiseUI() {
-
+        etPassword.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (keyCode == event.KEYCODE_ENTER) {
+                    performLogin();
+                }
+                return false;
+            }
+        });
     }
 
     //----------------------------------------------------------------------------------------------
@@ -81,6 +91,10 @@ public class LoginActivity extends BaseLoginActivity {
 
     @OnClick(R.id.btn_login)
     protected void onBtnLoginClicked() {
+        performLogin();
+    }
+
+    public void performLogin() {
         if (!validForm())
             return;
 
