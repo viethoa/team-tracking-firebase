@@ -4,9 +4,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
-import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.TextView;
 
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 import com.lorem_ipsum.utils.AnimationUtils;
 import com.lorem_ipsum.utils.DeviceUtils;
 import com.lorem_ipsum.utils.StringUtils;
@@ -22,10 +27,12 @@ import butterknife.OnClick;
 import us.originally.teamtrack.R;
 import us.originally.teamtrack.controllers.base.BaseLoginActivity;
 import us.originally.teamtrack.models.TeamModel;
-import us.originally.teamtrack.models.TeamUser;
+import us.originally.teamtrack.models.UserTeamModel;
 import us.originally.teamtrack.modules.firebase.FireBaseAction;
 
 public class LoginActivity extends BaseLoginActivity {
+
+    public static final String TEAM_GROUP = "Team_Group";
 
     @InjectView(R.id.et_name)
     EditText etName;
@@ -54,10 +61,10 @@ public class LoginActivity extends BaseLoginActivity {
     }
 
     protected void initialiseUI() {
-        etPassword.setOnKeyListener(new View.OnKeyListener() {
+        etPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (keyCode == event.KEYCODE_ENTER) {
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
                     performLogin();
                 }
                 return false;
@@ -94,7 +101,7 @@ public class LoginActivity extends BaseLoginActivity {
         performLogin();
     }
 
-    public void performLogin() {
+    protected void performLogin() {
         if (!validForm())
             return;
 
@@ -102,17 +109,12 @@ public class LoginActivity extends BaseLoginActivity {
         String yourName = etName.getText().toString();
         String teamName = etTeam.getText().toString();
         String password = takePasswordMd5(etPassword.getText().toString());
+        long timestemp = System.currentTimeMillis();
 
-        TeamUser user = new TeamUser(id, yourName, 0, 0);
-        TeamModel teamModel = new TeamModel(id, teamName, password);
+        UserTeamModel user = new UserTeamModel(id, yourName, 0, 0);
+        TeamModel teamModel = new TeamModel(teamName, password, timestemp);
 
-        boolean isLogin = FireBaseAction.takeLoginOrSubscribe(this, teamModel, user);
-        if (!isLogin) {
-            showToastErrorMessage("invalid password !");
-            return;
-        }
-
-        startActivity(MainActivity.getInstance(this));
+        takeLoginOrSubscribe(teamModel, user);
     }
 
     protected String takePasswordMd5(String password) {
@@ -160,5 +162,60 @@ public class LoginActivity extends BaseLoginActivity {
         }
 
         return true;
+    }
+
+    //----------------------------------------------------------------------------------------------
+    //  Api helper
+    //----------------------------------------------------------------------------------------------
+
+    protected void takeLoginOrSubscribe(final TeamModel teamModel, final UserTeamModel user) {
+        if (teamModel == null || user == null || StringUtils.isNull(teamModel.team_name))
+            return;
+
+        Firebase ref = FireBaseAction.getFirebaseRef(this);
+        if (ref == null)
+            return;
+
+        ref.child(TEAM_GROUP).child(teamModel.team_name).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                logDebug("Team: " + dataSnapshot.toString());
+                TeamModel team = null;
+                try {
+                    team = dataSnapshot.getValue(TeamModel.class);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                handleUserIntent(team, teamModel, user);
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                logError("Team error: " + firebaseError.getMessage());
+            }
+        });
+    }
+
+    protected void handleUserIntent(TeamModel firebaseTeam, TeamModel teamModel, UserTeamModel user) {
+        if (teamModel == null || user == null)
+            return;
+
+        //Create new team
+        if (firebaseTeam == null) {
+            FireBaseAction.addNewTeam(this, teamModel, user);
+            startActivity(MainActivity.getInstance(this));
+            super.finish();
+            return;
+        }
+
+        //Subscribe
+        if (!teamModel.password.equals(firebaseTeam.password)) {
+            showToastErrorMessage("Invalid password !");
+            return;
+        }
+
+        startActivity(MainActivity.getInstance(this));
+        super.finish();
     }
 }

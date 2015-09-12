@@ -8,17 +8,17 @@ import java.util.List;
  */
 public class TeamModel implements Serializable {
 
-    public String device_uuid;
     public String team_name;
     public String password;
-    public List<TeamUser> users;
+    public List<UserTeamModel> users;
+    public long update_timestamp;
 
     public TeamModel() {
     }
 
-    public TeamModel(String id, String team, String password) {
-        this.device_uuid = id;
+    public TeamModel(String team, String password, long update_timestamp) {
         this.team_name = team;
         this.password = password;
+        this.update_timestamp = update_timestamp;
     }
 }

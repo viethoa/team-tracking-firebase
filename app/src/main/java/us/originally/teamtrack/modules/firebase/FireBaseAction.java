@@ -14,8 +14,9 @@ import com.lorem_ipsum.utils.StringUtils;
 import de.greenrobot.event.EventBus;
 import us.originally.teamtrack.EventBus.MessageEvent;
 import us.originally.teamtrack.R;
+import us.originally.teamtrack.controllers.LoginActivity;
 import us.originally.teamtrack.models.TeamModel;
-import us.originally.teamtrack.models.TeamUser;
+import us.originally.teamtrack.models.UserTeamModel;
 import us.originally.teamtrack.modules.chat.MessageModel;
 import us.originally.teamtrack.modules.chat.audio.AudioModel;
 import us.originally.teamtrack.modules.chat.audio.AudioStreamManager;
@@ -26,15 +27,14 @@ import us.originally.teamtrack.modules.chat.audio.AudioStreamManager;
  */
 public class FireBaseAction {
 
-    protected static String TAG = "ChattingAction";
-    protected static String TEAM_GROUP = "Team_Group";
+    protected static String TAG = "FireBaseAction";
     protected static String myUUID = null;
 
     protected static EventBus eventBus;
     protected static Firebase firebaseRef;
     protected static ChildEventListener childEventListener;
 
-    protected static Firebase getFirebaseRef(Context context) {
+    public static Firebase getFirebaseRef(Context context) {
         if (firebaseRef != null)
             return firebaseRef;
 
@@ -112,78 +112,44 @@ public class FireBaseAction {
     // Login section
     //----------------------------------------------------------------------------------------------
 
-    public static boolean takeLoginOrSubscribe(Context context, TeamModel teamModel, TeamUser teamUser) {
-        if (teamModel == null || StringUtils.isNull(teamModel.team_name))
-            return false;
+    public static void addNewTeam(Context context, TeamModel teamModel, UserTeamModel user) {
+        if (teamModel == null || user == null || StringUtils.isNull(teamModel.team_name))
+            return;
 
-        Firebase ref = getFirebaseRef(context);
-        if (ref == null)
-            return false;
-
-        if (isTeamExist(context, teamModel)) {
-            boolean isPasswordCorrect = validPassword(context, teamModel, teamUser);
-            if (isPasswordCorrect)
-                addTeamUser(context, teamModel, teamUser);
-            return isPasswordCorrect;
-        }
-
-        ref.child(TEAM_GROUP).child(teamModel.team_name).setValue(teamModel, new Firebase.CompletionListener() {
-            @Override
-            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-                if (firebaseError != null) {
-                    Log.e(TAG, "FireBase Team could not be saved. " + firebaseError.getMessage());
-                } else {
-                    Log.d(TAG, "FireBase Team saved successfully.");
-                }
-            }
-        });
-
-        addTeamUser(context, teamModel, teamUser);
-        return true;
-    }
-
-    protected static boolean validPassword(Context context, TeamModel teamModel, TeamUser teamUser) {
-        if (teamModel == null || StringUtils.isNull(teamModel.team_name) || StringUtils.isNull(teamModel.password))
-            return false;
-
-        Firebase ref = getFirebaseRef(context);
-        if (ref == null)
-            return false;
-
-        Query myTeam = ref.child(TEAM_GROUP).child(teamModel.team_name);
-        return myTeam.equals(teamModel.password);
-    }
-
-    protected static void addTeamUser(Context context, TeamModel teamModel, TeamUser teamUser) {
         Firebase ref = getFirebaseRef(context);
         if (ref == null)
             return;
 
-        String userId = teamUser.name + "_" + teamUser.device_uuid;
-        ref.child(TEAM_GROUP).child(teamModel.team_name).child(userId)
-                .setValue(teamUser, new Firebase.CompletionListener() {
+        //Create new team
+        ref.child(LoginActivity.TEAM_GROUP).child(teamModel.team_name)
+                .setValue(teamModel, new Firebase.CompletionListener() {
                     @Override
                     public void onComplete(FirebaseError firebaseError, Firebase firebase) {
                         if (firebaseError != null) {
-                            Log.e(TAG, "FireBase TeamUser could not be saved. " + firebaseError.getMessage());
+                            Log.e(TAG, "FireBase Team could not be saved. " + firebaseError.getMessage());
                         } else {
-                            Log.d(TAG, "FireBase TeamUser saved successfully.");
+                            Log.d(TAG, "FireBase Team saved successfully.");
+                        }
+                    }
+                });
+
+        //Add user to Team
+        if (StringUtils.isNull(user.device_uuid))
+            user.device_uuid = DeviceUtils.getDeviceUUID(context);
+
+        ref.child(LoginActivity.TEAM_GROUP).child(teamModel.team_name).child("users").child(user.device_uuid)
+                .setValue(teamModel, new Firebase.CompletionListener() {
+                    @Override
+                    public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                        if (firebaseError != null) {
+                            Log.e(TAG, "FireBase User could not be saved. " + firebaseError.getMessage());
+                        } else {
+                            Log.d(TAG, "FireBase User saved successfully.");
                         }
                     }
                 });
     }
 
-    protected static boolean isTeamExist(Context context, TeamModel teamModel) {
-        if (teamModel == null || StringUtils.isNull(teamModel.team_name))
-            return false;
-
-        Firebase ref = getFirebaseRef(context);
-        if (ref == null)
-            return false;
-
-        Query teamGroup = ref.child(TEAM_GROUP);
-        return teamGroup.equals(teamModel.team_name);
-    }
 
     //----------------------------------------------------------------------------------------------
     // Audio message section
