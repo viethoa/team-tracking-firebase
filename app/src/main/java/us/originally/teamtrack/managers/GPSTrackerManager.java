@@ -53,7 +53,7 @@ public class GPSTrackerManager extends Service implements LocationListener {
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10; //10 metters
 
     //The minimum time beetwen updates in milliseconds
-    private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1; // 1 minute
+    private static final long MIN_TIME_BW_UPDATES = 1000 * 60; // 1 minute
 
     //Declaring a Location Manager
     protected LocationManager locationManager;
@@ -131,16 +131,6 @@ public class GPSTrackerManager extends Service implements LocationListener {
 
     public void stopUsingGPS() {
         if (locationManager != null) {
-            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    public void requestPermissions(@NonNull String[] permissions, int requestCode)
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for Activity#requestPermissions for more details.
-                return;
-            }
             locationManager.removeUpdates(GPSTrackerManager.this);
         }
     }
@@ -177,16 +167,16 @@ public class GPSTrackerManager extends Service implements LocationListener {
     /**
      * Function to show settings alert dialog
      */
-    public void showSettingsAlert() {
+    public void showSettingsAlert(Context context) {
         if (dialogUtils != null && !dialogUtils.isHidden())
             return;
 
-        String title = getString(R.string.dialog_gps_title);
-        String message = getString(R.string.dialog_gps_message);
-        String negativeButton = getString(R.string.dialog_gps_negative_btn);
-        String positiveButton = getString(R.string.dialog_gps_positive_btn);
+        String title = context.getString(R.string.dialog_gps_title);
+        String message = context.getString(R.string.dialog_gps_message);
+        String negativeButton = context.getString(R.string.dialog_gps_negative_btn);
+        String positiveButton = context.getString(R.string.dialog_gps_positive_btn);
         final Dialog gpsSettingDialog = DialogUtils.createDialogMessage(mContext, title,
-                message, negativeButton, positiveButton, true, new DialogUtils.DialogListener() {
+                message, negativeButton, positiveButton, false, new DialogUtils.DialogListener() {
                     @Override
                     public void onPositiveButton() {
                         goToLocationServiceSetting();

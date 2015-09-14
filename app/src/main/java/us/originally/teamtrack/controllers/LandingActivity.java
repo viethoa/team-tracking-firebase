@@ -40,7 +40,7 @@ public class LandingActivity extends MapBaseActivity implements GPSTrackerManage
     protected void initialiseGPS() {
         mGpsTracker = new GPSTrackerManager(this, getFragmentManager());
         if (!mGpsTracker.canGetLocation()) {
-            mGpsTracker.showSettingsAlert();
+            mGpsTracker.showSettingsAlert(this);
         } else {
             double lat = mGpsTracker.getLatitude();
             double lng = mGpsTracker.getLongitude();

@@ -3,11 +3,14 @@ package us.originally.teamtrack.customviews;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.RelativeLayout;
 
 import butterknife.ButterKnife;
+import butterknife.InjectView;
 import butterknife.OnClick;
 import us.originally.teamtrack.R;
 
@@ -17,6 +20,9 @@ import us.originally.teamtrack.R;
 public class ChattingView extends RelativeLayout {
 
     protected ChattingViewListener listener;
+
+    @InjectView(R.id.my_recycler_view)
+    RecyclerView mRecyclerView;
 
     public ChattingView(Context context) {
         super(context);
@@ -42,6 +48,8 @@ public class ChattingView extends RelativeLayout {
     protected void initialiseView(Context context) {
         View.inflate(context, R.layout.layout_chatting_view, this);
         ButterKnife.inject(this);
+
+        initialiseUI();
     }
 
     public interface ChattingViewListener {
@@ -54,6 +62,12 @@ public class ChattingView extends RelativeLayout {
 
     public void setOnChattingListener(ChattingViewListener listener) {
         this.listener = listener;
+    }
+
+    protected void initialiseUI() {
+        LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext());
+        mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setLayoutManager(mLayoutManager);
     }
 
     //----------------------------------------------------------------------------------------------

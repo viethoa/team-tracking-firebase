@@ -114,6 +114,7 @@ public class LoginActivity extends BaseLoginActivity {
         UserTeamModel user = new UserTeamModel(id, yourName, 0, 0);
         TeamModel teamModel = new TeamModel(teamName, password, timestemp);
 
+        showLoadingDialog();
         takeLoginOrSubscribe(teamModel, user);
     }
 
@@ -169,17 +170,23 @@ public class LoginActivity extends BaseLoginActivity {
     //----------------------------------------------------------------------------------------------
 
     protected void takeLoginOrSubscribe(final TeamModel teamModel, final UserTeamModel user) {
-        if (teamModel == null || user == null || StringUtils.isNull(teamModel.team_name))
+        if (teamModel == null || user == null || StringUtils.isNull(teamModel.team_name)) {
+            dismissLoadingDialog();
             return;
+        }
 
         Firebase ref = FireBaseAction.getFirebaseRef(this);
-        if (ref == null)
+        if (ref == null) {
+            dismissLoadingDialog();
             return;
+        }
 
         ref.child(TEAM_GROUP).child(teamModel.team_name).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 logDebug("Team: " + dataSnapshot.toString());
+                dismissLoadingDialog();
+
                 TeamModel team = null;
                 try {
                     team = dataSnapshot.getValue(TeamModel.class);
@@ -187,34 +194,43 @@ public class LoginActivity extends BaseLoginActivity {
                     e.printStackTrace();
                 }
 
-                handleUserIntent(team, teamModel, user);
+                if (team == null) {
+                    createNewTeam(teamModel, user);
+                    return;
+                }
+
+                subcribe(team, teamModel, user);
             }
 
             @Override
             public void onCancelled(FirebaseError firebaseError) {
+                dismissLoadingDialog();
                 logError("Team error: " + firebaseError.getMessage());
             }
         });
     }
 
-    protected void handleUserIntent(TeamModel firebaseTeam, TeamModel teamModel, UserTeamModel user) {
+    protected void createNewTeam(TeamModel teamModel, UserTeamModel user) {
         if (teamModel == null || user == null)
             return;
 
-        //Create new team
-        if (firebaseTeam == null) {
-            FireBaseAction.addNewTeam(this, teamModel, user);
-            startActivity(MainActivity.getInstance(this));
-            super.finish();
+        FireBaseAction.addNewTeam(this, teamModel, user);
+        startActivity(MainActivity.getInstance(this));
+        super.finish();
+    }
+
+    protected void subcribe(TeamModel firebaseTeam, TeamModel teamModel, UserTeamModel user) {
+        if (teamModel == null || user == null)
             return;
-        }
 
         //Subscribe
         if (!teamModel.password.equals(firebaseTeam.password)) {
+            AnimationUtils.shakeAnimationEdittext(this, etPassword);
             showToastErrorMessage("Invalid password !");
             return;
         }
 
+        FireBaseAction.addNewUserToTeam(this, teamModel, user);
         startActivity(MainActivity.getInstance(this));
         super.finish();
     }

@@ -133,9 +133,20 @@ public class FireBaseAction {
                     }
                 });
 
-        //Add user to Team
-        if (StringUtils.isNull(user.device_uuid))
+        addNewUserToTeam(context, teamModel, user);
+    }
+
+    public static void addNewUserToTeam(Context context, TeamModel teamModel, UserTeamModel user) {
+        if (teamModel == null || user == null || StringUtils.isNull(teamModel.team_name))
+            return;
+
+        Firebase ref = getFirebaseRef(context);
+        if (ref == null)
+            return;
+
+        if (StringUtils.isNull(user.device_uuid)) {
             user.device_uuid = DeviceUtils.getDeviceUUID(context);
+        }
 
         ref.child(LoginActivity.TEAM_GROUP).child(teamModel.team_name).child("users").child(user.device_uuid)
                 .setValue(teamModel, new Firebase.CompletionListener() {
@@ -149,7 +160,6 @@ public class FireBaseAction {
                     }
                 });
     }
-
 
     //----------------------------------------------------------------------------------------------
     // Audio message section
