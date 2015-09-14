@@ -8,6 +8,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.lorem_ipsum.activities.BaseActivity;
 
 import butterknife.ButterKnife;
@@ -70,10 +71,14 @@ public abstract class MapBaseActivity extends BaseActivity {
         MapsInitializer.initialize(this);
     }
 
-    protected void takeLocationWithCamera(double lat, double lng) {
+    protected void showLocationWithCamera(double lat, double lng) {
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng), 15);
         map.animateCamera(cameraUpdate);
     }
 
+    protected void showLocationNoneComaera(double lat, double lng) {
+        LatLng latLng = new LatLng(lat, lng);
+        map.addMarker(new MarkerOptions().position(latLng));
+    }
 
 }

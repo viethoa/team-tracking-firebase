@@ -12,6 +12,7 @@ import com.lorem_ipsum.utils.DeviceUtils;
 import com.lorem_ipsum.utils.StringUtils;
 
 import de.greenrobot.event.EventBus;
+import us.originally.teamtrack.Constant;
 import us.originally.teamtrack.EventBus.MessageEvent;
 import us.originally.teamtrack.R;
 import us.originally.teamtrack.controllers.LoginActivity;
@@ -148,8 +149,8 @@ public class FireBaseAction {
             user.device_uuid = DeviceUtils.getDeviceUUID(context);
         }
 
-        ref.child(LoginActivity.TEAM_GROUP).child(teamModel.team_name).child("users").child(user.device_uuid)
-                .setValue(user, new Firebase.CompletionListener() {
+        ref.child(LoginActivity.TEAM_GROUP).child(teamModel.team_name).child(Constant.SLUG_USERS)
+                .child(user.device_uuid).setValue(user, new Firebase.CompletionListener() {
                     @Override
                     public void onComplete(FirebaseError firebaseError, Firebase firebase) {
                         if (firebaseError != null) {

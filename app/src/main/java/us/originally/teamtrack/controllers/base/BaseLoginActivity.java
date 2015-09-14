@@ -16,10 +16,10 @@ import us.originally.teamtrack.modules.firebase.FireBaseAction;
  */
 public abstract class BaseLoginActivity extends BaseActivity {
 
-    protected static final String TEAM_GROUP = "Team_Group";
+    public static final String TEAM_GROUP = "Team_Group";
     protected TeamValueListener mTeamValueListener;
 
-    protected abstract void goToNextScreen();
+    protected abstract void goToNextScreen(TeamModel teamModel, UserTeamModel user);
 
     //----------------------------------------------------------------------------------------------
     //  Event
@@ -47,7 +47,7 @@ public abstract class BaseLoginActivity extends BaseActivity {
             return;
 
         FireBaseAction.addNewTeam(this, teamModel, user);
-        goToNextScreen();
+        goToNextScreen(teamModel, user);
         super.finish();
     }
 
@@ -62,7 +62,7 @@ public abstract class BaseLoginActivity extends BaseActivity {
         }
 
         FireBaseAction.addNewUserToTeam(this, teamModel, user);
-        goToNextScreen();
+        goToNextScreen(teamModel, user);
         super.finish();
     }
 

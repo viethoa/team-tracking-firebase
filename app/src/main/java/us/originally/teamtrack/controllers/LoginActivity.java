@@ -8,6 +8,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.lorem_ipsum.managers.CacheManager;
 import com.lorem_ipsum.utils.AnimationUtils;
 import com.lorem_ipsum.utils.DeviceUtils;
 import com.lorem_ipsum.utils.StringUtils;
@@ -27,6 +28,8 @@ import us.originally.teamtrack.models.UserTeamModel;
 
 public class LoginActivity extends BaseLoginActivity {
 
+    private static final String CACHE_TEAM_KEY = "team-name";
+    private static final String CACHE_USER_NAME_KEY = "user-name";
     private static final String EXTEC_LATITUDE = "latitude";
     private static final String EXTEC_LONGTITUDE = "longtitude";
     private double myLat;
@@ -61,12 +64,26 @@ public class LoginActivity extends BaseLoginActivity {
     //----------------------------------------------------------------------------------------------
 
     protected void initialiseData() {
+        //Data extract
         Bundle bundle = getIntent().getExtras();
         if (bundle == null)
             return;
 
         myLat = bundle.getDouble(EXTEC_LATITUDE);
         myLng = bundle.getDouble(EXTEC_LONGTITUDE);
+
+        //Data Cache
+        String teamName = CacheManager.getStringCacheData(CACHE_TEAM_KEY);
+        if (StringUtils.isNotNull(teamName)) {
+            etTeam.setText(teamName);
+            etName.requestFocus();
+        }
+
+        String userName = CacheManager.getStringCacheData(CACHE_USER_NAME_KEY);
+        if (StringUtils.isNotNull(userName)) {
+            etName.setText(userName);
+            etPassword.requestFocus();
+        }
     }
 
     protected void initialiseUI() {
@@ -111,8 +128,13 @@ public class LoginActivity extends BaseLoginActivity {
     }
 
     @Override
-    protected void goToNextScreen() {
-        startActivity(MainActivity.getInstance(this));
+    protected void goToNextScreen(TeamModel teamModel, UserTeamModel user) {
+        if (teamModel == null || user == null)
+            return;
+
+        CacheManager.saveStringCacheData(CACHE_TEAM_KEY, teamModel.team_name);
+        CacheManager.saveStringCacheData(CACHE_USER_NAME_KEY, user.name);
+        startActivity(MainActivity.getInstance(this, teamModel, user));
     }
 
     protected void performLogin() {

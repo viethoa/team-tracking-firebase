@@ -45,7 +45,7 @@ public class LandingActivity extends MapBaseActivity implements GPSTrackerManage
         } else {
             lat = mGpsTracker.getLatitude();
             lng = mGpsTracker.getLongitude();
-            takeLocationWithCamera(lat, lng);
+            showLocationWithCamera(lat, lng);
         }
     }
 
@@ -53,6 +53,6 @@ public class LandingActivity extends MapBaseActivity implements GPSTrackerManage
     public void onLocationChange(double lat, double lng) {
         this.lat = lat;
         this.lng = lng;
-        takeLocationWithCamera(lat, lng);
+        showLocationWithCamera(lat, lng);
     }
 }
