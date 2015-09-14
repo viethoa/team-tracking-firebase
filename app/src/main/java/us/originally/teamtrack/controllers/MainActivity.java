@@ -154,7 +154,7 @@ public class MainActivity extends MapBaseActivity implements GPSTrackerManager.G
             if (user == null)
                 return;
 
-            showLocationNoneComaera(user.lat, user.lng);
+            showLocationNoneCamera(user);
         }
 
         @Override

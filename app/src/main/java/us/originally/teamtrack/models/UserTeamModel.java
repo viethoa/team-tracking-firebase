@@ -12,6 +12,9 @@ public class UserTeamModel implements Serializable {
     public double lat;
     public double lng;
 
+    public UserTeamModel() {
+    }
+
     public UserTeamModel(String id, String name, double lat, double lng) {
         this.device_uuid = id;
         this.name = name;

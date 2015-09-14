@@ -7,6 +7,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.lorem_ipsum.activities.BaseActivity;
@@ -14,6 +15,7 @@ import com.lorem_ipsum.activities.BaseActivity;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import us.originally.teamtrack.R;
+import us.originally.teamtrack.models.UserTeamModel;
 
 /**
  * Created by VietHoa on 09/09/15.
@@ -76,9 +78,16 @@ public abstract class MapBaseActivity extends BaseActivity {
         map.animateCamera(cameraUpdate);
     }
 
-    protected void showLocationNoneComaera(double lat, double lng) {
-        LatLng latLng = new LatLng(lat, lng);
-        map.addMarker(new MarkerOptions().position(latLng));
+    protected void showLocationNoneCamera(UserTeamModel user) {
+        if (user == null)
+            return;
+
+        LatLng latLng = new LatLng(user.lat, user.lng);
+        map.addMarker(new MarkerOptions()
+                        .position(latLng)
+                        .title(user.name)
+                        .icon(BitmapDescriptorFactory.fromResource(R.mipmap.user_location))
+        );
     }
 
 }
