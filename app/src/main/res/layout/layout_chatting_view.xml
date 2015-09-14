@@ -13,13 +13,13 @@
         android:id="@+id/chat_header"
         android:layout_below="@id/header_box"
         android:layout_width="match_parent"
-        android:layout_height="30dp"
+        android:layout_height="25dp"
         android:background="@drawable/chat_header_bg"/>
 
     <ImageView
         android:id="@+id/btn_close"
         android:layout_width="40dp"
-        android:layout_height="30dp"
+        android:layout_height="25dp"
         android:layout_alignParentRight="true"
         android:layout_marginTop="@dimen/chatting_view_margin_top"
         android:scaleType="centerInside"
@@ -32,6 +32,8 @@
         android:layout_height="match_parent"
         android:layout_marginTop="-1dp"
         android:layout_marginBottom="@dimen/chatting_view_margin_bottom"
+        android:paddingTop="@dimen/small_space"
+        android:paddingBottom="@dimen/small_space"
         android:background="@color/app_effect_color_light"/>
 
     <LinearLayout
@@ -57,7 +59,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:textColor="@color/text_color_bright"
-            android:background="@color/app_orange_color"
+            android:background="@drawable/orange_button"
             android:text="send"/>
     </LinearLayout>
 </RelativeLayout>

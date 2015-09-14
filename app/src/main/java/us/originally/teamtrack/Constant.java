@@ -6,4 +6,5 @@ package us.originally.teamtrack;
 public class Constant {
 
     public static final String SLUG_USERS = "users";
+    public static final String SLUG_MESSAGE = "messages";
 }

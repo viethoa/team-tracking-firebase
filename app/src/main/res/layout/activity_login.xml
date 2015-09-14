@@ -24,7 +24,7 @@
                 android:layout_width="50dp"
                 android:layout_height="match_parent"
                 android:padding="@dimen/large_space"
-                android:background="@drawable/btn_effect_bg"
+                android:background="@drawable/primary_button"
                 android:scaleType="centerInside"
                 android:src="@mipmap/ic_btn_back"/>
 
@@ -44,7 +44,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:padding="@dimen/large_space"
-                android:background="@drawable/btn_effect_bg"
+                android:background="@drawable/primary_button"
                 android:scaleType="centerInside"
                 android:src="@mipmap/ic_checking" />
         </RelativeLayout>

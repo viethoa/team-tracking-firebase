@@ -11,6 +11,7 @@ public class UserTeamModel implements Serializable {
     public String name;
     public double lat;
     public double lng;
+    public boolean state;
 
     public UserTeamModel() {
     }

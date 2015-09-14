@@ -58,9 +58,8 @@
         <ImageView
             android:layout_width="@dimen/empty_space"
             android:layout_height="@dimen/footer_height"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
             android:layout_weight="1"
+            android:padding="7dp"
             android:scaleType="centerInside"
             android:src="@mipmap/ic_setting" />
 
@@ -73,9 +72,8 @@
             android:id="@+id/btn_open_chat_box"
             android:layout_width="@dimen/empty_space"
             android:layout_height="@dimen/footer_height"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
             android:layout_weight="1"
+            android:padding="7dp"
             android:scaleType="centerInside"
             android:src="@mipmap/ic_comment" />
     </LinearLayout>
@@ -83,5 +81,6 @@
     <us.originally.teamtrack.customviews.ChattingView
         android:id="@+id/chatting_box"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:visibility="visible"/>
 </RelativeLayout>

@@ -1,39 +1,32 @@
 package us.originally.teamtrack.controllers;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
-import com.firebase.client.ChildEventListener;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
 import com.lorem_ipsum.utils.DeviceUtils;
 import com.lorem_ipsum.utils.StringUtils;
 
 import butterknife.InjectView;
 import butterknife.OnClick;
-import us.originally.teamtrack.Constant;
 import us.originally.teamtrack.R;
-import us.originally.teamtrack.controllers.base.BaseLoginActivity;
-import us.originally.teamtrack.controllers.base.MapBaseActivity;
+import us.originally.teamtrack.controllers.base.TeamBaseActivity;
 import us.originally.teamtrack.customviews.ChattingView;
 import us.originally.teamtrack.customviews.VisualizerView;
 import us.originally.teamtrack.managers.GPSTrackerManager;
+import us.originally.teamtrack.models.Comment;
 import us.originally.teamtrack.models.TeamModel;
 import us.originally.teamtrack.models.UserTeamModel;
-import us.originally.teamtrack.modules.firebase.FireBaseAction;
 
-public class MainActivity extends MapBaseActivity implements GPSTrackerManager.GPSListener,
-        ChattingView.ChattingViewListener {
+public class MainActivity extends TeamBaseActivity implements
+        GPSTrackerManager.GPSListener, ChattingView.ChattingViewListener {
 
     private static final String EXTRACT_TEAM = "extrac-team";
     private static final String EXTRACT_USER = "extrac-user";
-
-    private static final int DURATION = 300;
-    private UserTeamModel mUser;
-    private TeamModel mTeam;
+    protected static final int DURATION = 300;
 
     @InjectView(R.id.visualizer)
     VisualizerView mVisualiser;
@@ -66,28 +59,21 @@ public class MainActivity extends MapBaseActivity implements GPSTrackerManager.G
     // Setup
     //----------------------------------------------------------------------------------------------
 
-    protected void initialiseData() {
+    @Override
+    protected void initialiseTeamData() {
         Bundle bundle = getIntent().getExtras();
         if (bundle == null)
             return;
 
-        //Show my location
         mUser = (UserTeamModel) bundle.getSerializable(EXTRACT_USER);
+        mTeam = (TeamModel) bundle.getSerializable(EXTRACT_TEAM);
+    }
+
+    protected void initialiseData() {
         if (mUser == null)
             return;
+
         showLocationWithCamera(mUser.lat, mUser.lng);
-
-        //Show my team location
-        mTeam = (TeamModel) bundle.getSerializable(EXTRACT_TEAM);
-        if (mTeam == null || StringUtils.isNull(mTeam.team_name))
-            return;
-
-        Firebase ref = FireBaseAction.getFirebaseRef(this);
-        if (ref == null)
-            return;
-
-        ref.child(BaseLoginActivity.TEAM_GROUP).child(mTeam.team_name).child(Constant.SLUG_USERS)
-                .addChildEventListener(new TeamChildListener());
     }
 
     protected void initialiseUI() {
@@ -105,11 +91,16 @@ public class MainActivity extends MapBaseActivity implements GPSTrackerManager.G
 
     @OnClick(R.id.btn_open_chat_box)
     protected void onBtnOpenChatBoxClicked() {
-        mVisualiser.setVisibility(View.GONE);
-
         float footerHeight = mFooter.getHeight();
         mFooter.animate()
                 .translationY(footerHeight)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                        mVisualiser.setVisibility(View.GONE);
+                    }
+                })
                 .setDuration(DURATION).start();
 
         mChattingBox.animate()
@@ -120,7 +111,6 @@ public class MainActivity extends MapBaseActivity implements GPSTrackerManager.G
     @Override
     public void onCloseChatBox() {
         mVisualiser.setVisibility(View.VISIBLE);
-
         mFooter.animate()
                 .translationY(0)
                 .setDuration(DURATION).start();
@@ -137,44 +127,31 @@ public class MainActivity extends MapBaseActivity implements GPSTrackerManager.G
     }
 
     //----------------------------------------------------------------------------------------------
-    // FireBase helper
+    // Team User section
     //----------------------------------------------------------------------------------------------
 
-    protected class TeamChildListener implements ChildEventListener {
+    @Override
+    protected void onTeamUserJoined(UserTeamModel user) {
+        showLocationNoneCamera(user);
+    }
 
-        @Override
-        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-            System.out.println(dataSnapshot.getValue());
-            UserTeamModel user = null;
-            try {
-                user = dataSnapshot.getValue(UserTeamModel.class);
-            } catch(Exception e) {
-                e.printStackTrace();
-            }
-            if (user == null)
-                return;
+    //----------------------------------------------------------------------------------------------
+    // Team Message section
+    //----------------------------------------------------------------------------------------------
 
-            showLocationNoneCamera(user);
-        }
+    @Override
+    protected void onShowComment(Comment comment) {
+        if (comment == null || StringUtils.isNull(comment.message))
+            return;
+        mChattingBox.pushComment(comment);
+    }
 
-        @Override
-        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+    @Override
+    public void onPushComment(String comment) {
+        if (StringUtils.isNull(comment) || mUser == null)
+            return;
 
-        }
-
-        @Override
-        public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-        }
-
-        @Override
-        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-        }
-
-        @Override
-        public void onCancelled(FirebaseError firebaseError) {
-
-        }
+        Comment userComment = new Comment(comment, mUser);
+        pushComment(userComment);
     }
 }

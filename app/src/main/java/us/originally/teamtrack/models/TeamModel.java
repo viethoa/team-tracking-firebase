@@ -11,6 +11,7 @@ public class TeamModel implements Serializable {
     public String team_name;
     public String password;
     public List<UserTeamModel> users;
+    public List<Comment> messages;
     public long update_timestamp;
 
     public TeamModel() {

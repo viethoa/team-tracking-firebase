@@ -9,6 +9,7 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.lorem_ipsum.activities.BaseActivity;
 
@@ -82,12 +83,16 @@ public abstract class MapBaseActivity extends BaseActivity {
         if (user == null)
             return;
 
+        //Add marker to my map
         LatLng latLng = new LatLng(user.lat, user.lng);
-        map.addMarker(new MarkerOptions()
+        Marker marker = map.addMarker(new MarkerOptions()
                         .position(latLng)
                         .title(user.name)
                         .icon(BitmapDescriptorFactory.fromResource(R.mipmap.user_location))
         );
+
+        //Show marker title always
+        marker.showInfoWindow();
     }
 
 }

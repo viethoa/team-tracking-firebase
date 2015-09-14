@@ -7,10 +7,10 @@
         android:bottom="1px">
 
         <shape android:shape="rectangle">
-            <solid android:color="@color/chatting_header" />
+            <solid android:color="@color/chatting_header_solid" />
             <stroke
                 android:width="1px"
-                android:color="@color/text_color_light" />
+                android:color="@color/chatting_header_border" />
         </shape>
     </item>
 </layer-list>

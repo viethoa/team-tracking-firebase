@@ -12,6 +12,7 @@
 
     <color name="app_green_color">#43A047</color>
     <color name="app_orange_color">#FF5722</color>
+    <color name="app_orange_color_dark">#BF360C</color>
     <color name="app_blue_color">#2196F3</color>
     <color name="app_teal_color">#009688</color>
 
@@ -23,5 +24,6 @@
     <color name="text_color_bright">#FFFFFFFF</color>
 
     <color name="visualizer_dark">#663A5795</color>
-    <color name="chatting_header">#E0E0E0</color>
+    <color name="chatting_header_solid">#ECECEC</color>
+    <color name="chatting_header_border">#E0E0E0</color>
 </resources>
