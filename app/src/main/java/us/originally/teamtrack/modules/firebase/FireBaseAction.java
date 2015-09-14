@@ -149,7 +149,7 @@ public class FireBaseAction {
         }
 
         ref.child(LoginActivity.TEAM_GROUP).child(teamModel.team_name).child("users").child(user.device_uuid)
-                .setValue(teamModel, new Firebase.CompletionListener() {
+                .setValue(user, new Firebase.CompletionListener() {
                     @Override
                     public void onComplete(FirebaseError firebaseError, Firebase firebase) {
                         if (firebaseError != null) {

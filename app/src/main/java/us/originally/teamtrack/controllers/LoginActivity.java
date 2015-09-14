@@ -33,6 +33,7 @@ import us.originally.teamtrack.modules.firebase.FireBaseAction;
 public class LoginActivity extends BaseLoginActivity {
 
     public static final String TEAM_GROUP = "Team_Group";
+    private TeamValueListener mTeamValueListener;
 
     @InjectView(R.id.et_name)
     EditText etName;
@@ -165,6 +166,31 @@ public class LoginActivity extends BaseLoginActivity {
         return true;
     }
 
+    protected void createNewTeam(TeamModel teamModel, UserTeamModel user) {
+        if (teamModel == null || user == null)
+            return;
+
+        FireBaseAction.addNewTeam(this, teamModel, user);
+        startActivity(MainActivity.getInstance(this));
+        super.finish();
+    }
+
+    protected void subcribe(String password, TeamModel teamModel, UserTeamModel user) {
+        if (teamModel == null || user == null)
+            return;
+
+        if (StringUtils.isNull(password) || StringUtils.isNull(teamModel.password) ||
+                !teamModel.password.equals(password)) {
+            AnimationUtils.shakeAnimationEdittext(this, etPassword);
+            showToastErrorMessage("Invalid password !");
+            return;
+        }
+
+        FireBaseAction.addNewUserToTeam(this, teamModel, user);
+        startActivity(MainActivity.getInstance(this));
+        super.finish();
+    }
+
     //----------------------------------------------------------------------------------------------
     //  Api helper
     //----------------------------------------------------------------------------------------------
@@ -181,57 +207,53 @@ public class LoginActivity extends BaseLoginActivity {
             return;
         }
 
-        ref.child(TEAM_GROUP).child(teamModel.team_name).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                logDebug("Team: " + dataSnapshot.toString());
-                dismissLoadingDialog();
-
-                TeamModel team = null;
-                try {
-                    team = dataSnapshot.getValue(TeamModel.class);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                if (team == null) {
-                    createNewTeam(teamModel, user);
-                    return;
-                }
-
-                subcribe(team, teamModel, user);
-            }
-
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-                dismissLoadingDialog();
-                logError("Team error: " + firebaseError.getMessage());
-            }
-        });
+        ref = ref.child(TEAM_GROUP).child(teamModel.team_name);
+        mTeamValueListener = new TeamValueListener(ref, teamModel, user);
+        ref.addValueEventListener(mTeamValueListener);
     }
 
-    protected void createNewTeam(TeamModel teamModel, UserTeamModel user) {
-        if (teamModel == null || user == null)
+    protected void removeLoginValueListener(Firebase ref) {
+        if (mTeamValueListener == null)
             return;
 
-        FireBaseAction.addNewTeam(this, teamModel, user);
-        startActivity(MainActivity.getInstance(this));
-        super.finish();
+        ref.removeEventListener(mTeamValueListener);
+        mTeamValueListener = null;
     }
 
-    protected void subcribe(TeamModel firebaseTeam, TeamModel teamModel, UserTeamModel user) {
-        if (teamModel == null || user == null)
-            return;
+   protected class TeamValueListener implements ValueEventListener {
 
-        //Subscribe
-        if (!teamModel.password.equals(firebaseTeam.password)) {
-            AnimationUtils.shakeAnimationEdittext(this, etPassword);
-            showToastErrorMessage("Invalid password !");
-            return;
-        }
+       private Firebase ref;
+       private TeamModel teamModel;
+       private UserTeamModel user;
 
-        FireBaseAction.addNewUserToTeam(this, teamModel, user);
-        startActivity(MainActivity.getInstance(this));
-        super.finish();
-    }
+       public TeamValueListener(Firebase ref, TeamModel teamModel, UserTeamModel user) {
+           this.teamModel = teamModel;
+           this.user = user;
+           this.ref = ref;
+       }
+
+       @Override
+       public void onDataChange(DataSnapshot dataSnapshot) {
+           logDebug("Team: " + dataSnapshot.toString());
+           removeLoginValueListener(ref);
+           dismissLoadingDialog();
+
+           System.out.println(dataSnapshot.getValue());
+           if (dataSnapshot.getValue() == null) {
+               createNewTeam(teamModel, user);
+               return;
+           }
+
+           DataSnapshot passwordSnapshot = dataSnapshot.child("password");
+           String teamPassword = passwordSnapshot.getValue(String.class);
+           logDebug("password: " + teamPassword);
+           subcribe(teamPassword, teamModel, user);
+       }
+
+       @Override
+       public void onCancelled(FirebaseError firebaseError) {
+           dismissLoadingDialog();
+           logError("Team error: " + firebaseError.getMessage());
+       }
+   }
 }
