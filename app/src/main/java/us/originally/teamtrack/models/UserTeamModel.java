@@ -9,10 +9,10 @@ public class UserTeamModel implements Serializable {
 
     public String device_uuid;
     public String name;
-    public Float lat;
-    public Float lng;
+    public double lat;
+    public double lng;
 
-    public UserTeamModel(String id, String name, float lat, float lng) {
+    public UserTeamModel(String id, String name, double lat, double lng) {
         this.device_uuid = id;
         this.name = name;
         this.lat = lat;

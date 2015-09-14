@@ -12,6 +12,7 @@ import us.originally.teamtrack.managers.GPSTrackerManager;
 public class LandingActivity extends MapBaseActivity implements GPSTrackerManager.GPSListener {
 
     protected GPSTrackerManager mGpsTracker;
+    private double lat, lng;
 
     @InjectView(R.id.btn_add_team)
     View vAddNewTeam;
@@ -30,7 +31,7 @@ public class LandingActivity extends MapBaseActivity implements GPSTrackerManage
 
     @OnClick(R.id.btn_add_team)
     protected void onAddNewTeamClicked() {
-        startActivity(LoginActivity.getInstance(this));
+        startActivity(LoginActivity.getInstance(this, lat, lng));
     }
 
     //----------------------------------------------------------------------------------------------
@@ -42,14 +43,16 @@ public class LandingActivity extends MapBaseActivity implements GPSTrackerManage
         if (!mGpsTracker.canGetLocation()) {
             mGpsTracker.showSettingsAlert(this);
         } else {
-            double lat = mGpsTracker.getLatitude();
-            double lng = mGpsTracker.getLongitude();
+            lat = mGpsTracker.getLatitude();
+            lng = mGpsTracker.getLongitude();
             takeLocationWithCamera(lat, lng);
         }
     }
 
     @Override
     public void onLocationChange(double lat, double lng) {
+        this.lat = lat;
+        this.lng = lng;
         takeLocationWithCamera(lat, lng);
     }
 }

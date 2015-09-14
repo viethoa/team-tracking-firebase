@@ -8,10 +8,6 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
 import com.lorem_ipsum.utils.AnimationUtils;
 import com.lorem_ipsum.utils.DeviceUtils;
 import com.lorem_ipsum.utils.StringUtils;
@@ -28,12 +24,13 @@ import us.originally.teamtrack.R;
 import us.originally.teamtrack.controllers.base.BaseLoginActivity;
 import us.originally.teamtrack.models.TeamModel;
 import us.originally.teamtrack.models.UserTeamModel;
-import us.originally.teamtrack.modules.firebase.FireBaseAction;
 
 public class LoginActivity extends BaseLoginActivity {
 
-    public static final String TEAM_GROUP = "Team_Group";
-    private TeamValueListener mTeamValueListener;
+    private static final String EXTEC_LATITUDE = "latitude";
+    private static final String EXTEC_LONGTITUDE = "longtitude";
+    private double myLat;
+    private double myLng;
 
     @InjectView(R.id.et_name)
     EditText etName;
@@ -42,8 +39,10 @@ public class LoginActivity extends BaseLoginActivity {
     @InjectView(R.id.et_password)
     EditText etPassword;
 
-    public static Intent getInstance(Context context) {
+    public static Intent getInstance(Context context, double lat, double lng) {
         Intent intent = new Intent(context, LoginActivity.class);
+        intent.putExtra(EXTEC_LATITUDE, lat);
+        intent.putExtra(EXTEC_LONGTITUDE, lng);
         return intent;
     }
 
@@ -57,8 +56,17 @@ public class LoginActivity extends BaseLoginActivity {
         initialiseUI();
     }
 
-    protected void initialiseData() {
+    //----------------------------------------------------------------------------------------------
+    //  Setup
+    //----------------------------------------------------------------------------------------------
 
+    protected void initialiseData() {
+        Bundle bundle = getIntent().getExtras();
+        if (bundle == null)
+            return;
+
+        myLat = bundle.getDouble(EXTEC_LATITUDE);
+        myLng = bundle.getDouble(EXTEC_LONGTITUDE);
     }
 
     protected void initialiseUI() {
@@ -102,6 +110,11 @@ public class LoginActivity extends BaseLoginActivity {
         performLogin();
     }
 
+    @Override
+    protected void goToNextScreen() {
+        startActivity(MainActivity.getInstance(this));
+    }
+
     protected void performLogin() {
         if (!validForm())
             return;
@@ -110,10 +123,10 @@ public class LoginActivity extends BaseLoginActivity {
         String yourName = etName.getText().toString();
         String teamName = etTeam.getText().toString();
         String password = takePasswordMd5(etPassword.getText().toString());
-        long timestemp = System.currentTimeMillis();
+        long timeStemp = System.currentTimeMillis();
 
-        UserTeamModel user = new UserTeamModel(id, yourName, 0, 0);
-        TeamModel teamModel = new TeamModel(teamName, password, timestemp);
+        UserTeamModel user = new UserTeamModel(id, yourName, myLat, myLng);
+        TeamModel teamModel = new TeamModel(teamName, password, timeStemp);
 
         showLoadingDialog();
         takeLoginOrSubscribe(teamModel, user);
@@ -165,95 +178,4 @@ public class LoginActivity extends BaseLoginActivity {
 
         return true;
     }
-
-    protected void createNewTeam(TeamModel teamModel, UserTeamModel user) {
-        if (teamModel == null || user == null)
-            return;
-
-        FireBaseAction.addNewTeam(this, teamModel, user);
-        startActivity(MainActivity.getInstance(this));
-        super.finish();
-    }
-
-    protected void subcribe(String password, TeamModel teamModel, UserTeamModel user) {
-        if (teamModel == null || user == null)
-            return;
-
-        if (StringUtils.isNull(password) || StringUtils.isNull(teamModel.password) ||
-                !teamModel.password.equals(password)) {
-            AnimationUtils.shakeAnimationEdittext(this, etPassword);
-            showToastErrorMessage("Invalid password !");
-            return;
-        }
-
-        FireBaseAction.addNewUserToTeam(this, teamModel, user);
-        startActivity(MainActivity.getInstance(this));
-        super.finish();
-    }
-
-    //----------------------------------------------------------------------------------------------
-    //  Api helper
-    //----------------------------------------------------------------------------------------------
-
-    protected void takeLoginOrSubscribe(final TeamModel teamModel, final UserTeamModel user) {
-        if (teamModel == null || user == null || StringUtils.isNull(teamModel.team_name)) {
-            dismissLoadingDialog();
-            return;
-        }
-
-        Firebase ref = FireBaseAction.getFirebaseRef(this);
-        if (ref == null) {
-            dismissLoadingDialog();
-            return;
-        }
-
-        ref = ref.child(TEAM_GROUP).child(teamModel.team_name);
-        mTeamValueListener = new TeamValueListener(ref, teamModel, user);
-        ref.addValueEventListener(mTeamValueListener);
-    }
-
-    protected void removeLoginValueListener(Firebase ref) {
-        if (mTeamValueListener == null)
-            return;
-
-        ref.removeEventListener(mTeamValueListener);
-        mTeamValueListener = null;
-    }
-
-   protected class TeamValueListener implements ValueEventListener {
-
-       private Firebase ref;
-       private TeamModel teamModel;
-       private UserTeamModel user;
-
-       public TeamValueListener(Firebase ref, TeamModel teamModel, UserTeamModel user) {
-           this.teamModel = teamModel;
-           this.user = user;
-           this.ref = ref;
-       }
-
-       @Override
-       public void onDataChange(DataSnapshot dataSnapshot) {
-           logDebug("Team: " + dataSnapshot.toString());
-           removeLoginValueListener(ref);
-           dismissLoadingDialog();
-
-           System.out.println(dataSnapshot.getValue());
-           if (dataSnapshot.getValue() == null) {
-               createNewTeam(teamModel, user);
-               return;
-           }
-
-           DataSnapshot passwordSnapshot = dataSnapshot.child("password");
-           String teamPassword = passwordSnapshot.getValue(String.class);
-           logDebug("password: " + teamPassword);
-           subcribe(teamPassword, teamModel, user);
-       }
-
-       @Override
-       public void onCancelled(FirebaseError firebaseError) {
-           dismissLoadingDialog();
-           logError("Team error: " + firebaseError.getMessage());
-       }
-   }
 }
