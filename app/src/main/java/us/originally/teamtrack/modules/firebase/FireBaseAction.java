@@ -110,59 +110,6 @@ public class FireBaseAction {
     }
 
     //----------------------------------------------------------------------------------------------
-    // Login section
-    //----------------------------------------------------------------------------------------------
-
-    public static void addNewTeam(Context context, TeamModel teamModel, UserTeamModel user) {
-        if (teamModel == null || user == null || StringUtils.isNull(teamModel.team_name))
-            return;
-
-        Firebase ref = getFirebaseRef(context);
-        if (ref == null)
-            return;
-
-        //Create new team
-        ref.child(LoginActivity.TEAM_GROUP).child(teamModel.team_name)
-                .setValue(teamModel, new Firebase.CompletionListener() {
-                    @Override
-                    public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-                        if (firebaseError != null) {
-                            Log.e(TAG, "FireBase Team could not be saved. " + firebaseError.getMessage());
-                        } else {
-                            Log.d(TAG, "FireBase Team saved successfully.");
-                        }
-                    }
-                });
-
-        addNewUserToTeam(context, teamModel, user);
-    }
-
-    public static void addNewUserToTeam(Context context, TeamModel teamModel, UserTeamModel user) {
-        if (teamModel == null || user == null || StringUtils.isNull(teamModel.team_name))
-            return;
-
-        Firebase ref = getFirebaseRef(context);
-        if (ref == null)
-            return;
-
-        if (StringUtils.isNull(user.device_uuid)) {
-            user.device_uuid = DeviceUtils.getDeviceUUID(context);
-        }
-
-        ref.child(LoginActivity.TEAM_GROUP).child(teamModel.team_name).child(Constant.SLUG_USERS)
-                .child(user.device_uuid).setValue(user, new Firebase.CompletionListener() {
-                    @Override
-                    public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-                        if (firebaseError != null) {
-                            Log.e(TAG, "FireBase User could not be saved. " + firebaseError.getMessage());
-                        } else {
-                            Log.d(TAG, "FireBase User saved successfully.");
-                        }
-                    }
-                });
-    }
-
-    //----------------------------------------------------------------------------------------------
     // Audio message section
     //----------------------------------------------------------------------------------------------
 

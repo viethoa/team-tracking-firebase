@@ -1,5 +1,7 @@
 package us.originally.teamtrack.models;
 
+import com.google.android.gms.maps.model.Marker;
+
 import java.io.Serializable;
 
 /**
@@ -21,5 +23,6 @@ public class UserTeamModel implements Serializable {
         this.name = name;
         this.lat = lat;
         this.lng = lng;
+        this.state = true;
     }
 }

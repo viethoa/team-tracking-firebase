@@ -12,6 +12,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.lorem_ipsum.activities.BaseActivity;
+import com.lorem_ipsum.utils.StringUtils;
+
+import java.util.ArrayList;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -22,10 +25,26 @@ import us.originally.teamtrack.models.UserTeamModel;
  * Created by VietHoa on 09/09/15.
  */
 public abstract class MapBaseActivity extends BaseActivity {
+
+    protected class UserOnMap {
+        public UserTeamModel user;
+        public Marker marker;
+    }
+
     protected GoogleMap map;
+    protected ArrayList<UserOnMap> mUsersOnMap;
 
     @InjectView(R.id.mapview)
     protected MapView mapView;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView();
+
+        ButterKnife.inject(this);
+        initialiseMap(savedInstanceState);
+    }
 
     @Override
     public void onResume() {
@@ -53,14 +72,9 @@ public abstract class MapBaseActivity extends BaseActivity {
 
     protected abstract void setContentView();
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView();
-
-        ButterKnife.inject(this);
-        initialiseMap(savedInstanceState);
-    }
+    //----------------------------------------------------------------------------------------------
+    //  Setup
+    //----------------------------------------------------------------------------------------------
 
     protected void initialiseMap(Bundle savedInstanceState) {
         mapView.onCreate(savedInstanceState);
@@ -74,25 +88,57 @@ public abstract class MapBaseActivity extends BaseActivity {
         MapsInitializer.initialize(this);
     }
 
+    //----------------------------------------------------------------------------------------------
+    //  Event
+    //----------------------------------------------------------------------------------------------
+
     protected void showLocationWithCamera(double lat, double lng) {
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng), 15);
         map.animateCamera(cameraUpdate);
     }
 
-    protected void showLocationNoneCamera(UserTeamModel user) {
+    protected void addUserToMapWithNoneCamera(UserTeamModel user) {
         if (user == null)
             return;
 
+        UserOnMap userOnMap = new UserOnMap();
+        userOnMap.user = user;
+
         //Add marker to my map
         LatLng latLng = new LatLng(user.lat, user.lng);
-        Marker marker = map.addMarker(new MarkerOptions()
+        userOnMap.marker = map.addMarker(new MarkerOptions()
                         .position(latLng)
                         .title(user.name)
-                        .icon(BitmapDescriptorFactory.fromResource(R.mipmap.user_location))
+                        .icon(BitmapDescriptorFactory.fromResource(R.mipmap.user_location_onl))
         );
 
         //Show marker title always
-        marker.showInfoWindow();
+        userOnMap.marker.showInfoWindow();
+
+        //Save user
+        if (mUsersOnMap == null)
+            mUsersOnMap = new ArrayList<>();
+        mUsersOnMap.add(userOnMap);
     }
 
+    protected void takeUserOnMapOfflineOrOnline(UserTeamModel user) {
+        if (user == null || StringUtils.isNull(user.device_uuid))
+            return;
+
+        if (mUsersOnMap == null || mUsersOnMap.size() <= 0)
+            return;
+
+        for (UserOnMap userOnMap : mUsersOnMap) {
+            if (userOnMap.user == null || StringUtils.isNull(userOnMap.user.device_uuid))
+                continue;
+
+            if (userOnMap.user.device_uuid.equals(user.device_uuid)) {
+                userOnMap.marker.setIcon(
+                        user.state ? BitmapDescriptorFactory.fromResource(R.mipmap.user_location_onl)
+                                : BitmapDescriptorFactory.fromResource(R.mipmap.user_location_off)
+                );
+                break;
+            }
+        }
+    }
 }

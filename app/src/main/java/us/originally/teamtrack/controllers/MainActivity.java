@@ -1,10 +1,9 @@
 package us.originally.teamtrack.controllers;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.TextView;
 
@@ -59,6 +58,24 @@ public class MainActivity extends TeamBaseActivity implements
         initialiseUI();
     }
 
+    @Override
+    protected void onStart() {
+        if (mUser != null) {
+            mUser.state = true;
+            onChangeUserInfoOrState(mUser);
+        }
+        super.onStart();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mUser != null) {
+            mUser.state = false;
+            onChangeUserInfoOrState(mUser);
+        }
+        super.onBackPressed();
+    }
+
     //----------------------------------------------------------------------------------------------
     // Setup
     //----------------------------------------------------------------------------------------------
@@ -101,14 +118,14 @@ public class MainActivity extends TeamBaseActivity implements
         float footerHeight = mFooter.getHeight();
         mFooter.animate()
                 .translationY(footerHeight)
-                .setListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        super.onAnimationEnd(animation);
-                        mVisualiser.setVisibility(View.GONE);
-                    }
-                })
                 .setDuration(DURATION).start();
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mVisualiser.setVisibility(View.GONE);
+            }
+        }, DURATION);
 
         mChattingBox.animate()
                 .translationY(0)
@@ -126,6 +143,8 @@ public class MainActivity extends TeamBaseActivity implements
         mChattingBox.animate()
                 .translationY(height)
                 .setDuration(DURATION).start();
+
+        DeviceUtils.hideKeyboard(this);
     }
 
     @Override
@@ -138,8 +157,23 @@ public class MainActivity extends TeamBaseActivity implements
     //----------------------------------------------------------------------------------------------
 
     @Override
-    protected void onTeamUserJoined(UserTeamModel user) {
-        showLocationNoneCamera(user);
+    protected void onUserSubscribed(UserTeamModel user) {
+        if (user == null)
+            return;
+
+        if (mUser != null && StringUtils.isNotNull(mUser.device_uuid) && StringUtils.isNotNull(user.device_uuid)
+                && mUser.device_uuid.equals(user.device_uuid))
+            return;
+
+        addUserToMapWithNoneCamera(user);
+    }
+
+    @Override
+    protected void onUserUnSubscribed(UserTeamModel user) {
+        if (user == null)
+            return;
+
+        takeUserOnMapOfflineOrOnline(user);
     }
 
     //----------------------------------------------------------------------------------------------

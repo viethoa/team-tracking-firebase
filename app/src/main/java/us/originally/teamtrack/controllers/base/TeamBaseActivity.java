@@ -1,14 +1,17 @@
 package us.originally.teamtrack.controllers.base;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
+import com.lorem_ipsum.utils.AppUtils;
 import com.lorem_ipsum.utils.StringUtils;
 
 import us.originally.teamtrack.Constant;
+import us.originally.teamtrack.controllers.LoginActivity;
 import us.originally.teamtrack.models.Comment;
 import us.originally.teamtrack.models.TeamModel;
 import us.originally.teamtrack.models.UserTeamModel;
@@ -25,10 +28,29 @@ public abstract class TeamBaseActivity extends MapBaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AppUtils.setAppState(false);
 
         initialiseTeamData();
         initialiseTeamUser();
         initialiseTeamMessage();
+    }
+
+    @Override
+    public void startActivity(Intent intent) {
+        AppUtils.setAppState(true);
+        super.startActivity(intent);
+    }
+
+    @Override
+    public void onPause() {
+        if (!AppUtils.getAppState()) {
+            logDebug("app stopped by home button");
+            if (mUser != null) {
+                mUser.state = false;
+                onChangeUserInfoOrState(mUser);
+            }
+        }
+        super.onPause();
     }
 
     protected abstract void initialiseTeamData();
@@ -106,12 +128,33 @@ public abstract class TeamBaseActivity extends MapBaseActivity {
         }
     }
 
-
     //----------------------------------------------------------------------------------------------
     // Users helper
     //----------------------------------------------------------------------------------------------
 
-    protected abstract void onTeamUserJoined(UserTeamModel user);
+    protected abstract void onUserSubscribed(UserTeamModel user);
+    protected abstract void onUserUnSubscribed(UserTeamModel user);
+
+    protected void onChangeUserInfoOrState(UserTeamModel user) {
+        if (user == null || mTeam == null || StringUtils.isNull(mTeam.team_name))
+            return;
+
+        Firebase ref = FireBaseAction.getFirebaseRef(this);
+        if (ref == null)
+            return;
+
+        ref.child(LoginActivity.TEAM_GROUP).child(mTeam.team_name).child(Constant.SLUG_USERS)
+                .child(user.device_uuid).setValue(user, new Firebase.CompletionListener() {
+            @Override
+            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                if (firebaseError != null) {
+                    logDebug("FireBase User could not be saved. " + firebaseError.getMessage());
+                } else {
+                    logDebug("FireBase User saved successfully.");
+                }
+            }
+        });
+    }
 
     protected void initialiseTeamUser() {
         if (mTeam == null || StringUtils.isNull(mTeam.team_name))
@@ -135,20 +178,34 @@ public abstract class TeamBaseActivity extends MapBaseActivity {
         if (user == null)
             return;
 
-        onTeamUserJoined(user);
+        onUserSubscribed(user);
+    }
+
+    protected void onUserUnSubscribed(DataSnapshot dataSnapshot) {
+        UserTeamModel user = null;
+        try {
+            user = dataSnapshot.getValue(UserTeamModel.class);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        if (user == null)
+            return;
+
+        onUserUnSubscribed(user);
     }
 
     public class UsersEventListener implements ChildEventListener {
 
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-            logDebug("team: " + dataSnapshot.getValue());
+            logDebug("user add: " + dataSnapshot.getValue());
             onUserSubscribed(dataSnapshot);
         }
 
         @Override
         public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
+            logDebug("user change: " + dataSnapshot.getValue());
+            onUserUnSubscribed(dataSnapshot);
         }
 
         @Override

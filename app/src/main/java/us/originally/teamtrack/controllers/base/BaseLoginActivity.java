@@ -5,8 +5,11 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 import com.lorem_ipsum.activities.BaseActivity;
+import com.lorem_ipsum.utils.DeviceUtils;
 import com.lorem_ipsum.utils.StringUtils;
 
+import us.originally.teamtrack.Constant;
+import us.originally.teamtrack.controllers.LoginActivity;
 import us.originally.teamtrack.models.TeamModel;
 import us.originally.teamtrack.models.UserTeamModel;
 import us.originally.teamtrack.modules.firebase.FireBaseAction;
@@ -42,17 +45,20 @@ public abstract class BaseLoginActivity extends BaseActivity {
         ref.addValueEventListener(mTeamValueListener);
     }
 
-    protected void createNewTeam(TeamModel teamModel, UserTeamModel user) {
-        if (teamModel == null || user == null)
+    protected void removeLoginValueListener(Firebase ref) {
+        if (mTeamValueListener == null)
             return;
 
-        FireBaseAction.addNewTeam(this, teamModel, user);
-        goToNextScreen(teamModel, user);
-        super.finish();
+        ref.removeEventListener(mTeamValueListener);
+        mTeamValueListener = null;
     }
 
+    //----------------------------------------------------------------------------------------------
+    //  FireBase Event
+    //----------------------------------------------------------------------------------------------
+
     protected void subscribe(String password, TeamModel teamModel, UserTeamModel user) {
-        if (teamModel == null || user == null)
+        if (teamModel == null || user == null || StringUtils.isNull(teamModel.team_name))
             return;
 
         if (StringUtils.isNull(password) || StringUtils.isNull(teamModel.password) ||
@@ -61,17 +67,59 @@ public abstract class BaseLoginActivity extends BaseActivity {
             return;
         }
 
-        FireBaseAction.addNewUserToTeam(this, teamModel, user);
+        addNewUserToTeam(teamModel, user);
         goToNextScreen(teamModel, user);
         super.finish();
     }
 
-    protected void removeLoginValueListener(Firebase ref) {
-        if (mTeamValueListener == null)
+    protected void createNewTeam(TeamModel teamModel, UserTeamModel user) {
+        if (teamModel == null || user == null || StringUtils.isNull(teamModel.team_name))
             return;
 
-        ref.removeEventListener(mTeamValueListener);
-        mTeamValueListener = null;
+        Firebase ref = FireBaseAction.getFirebaseRef(this);
+        if (ref == null)
+            return;
+
+        ref.child(LoginActivity.TEAM_GROUP).child(teamModel.team_name)
+                .setValue(teamModel, new Firebase.CompletionListener() {
+                    @Override
+                    public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                        if (firebaseError != null) {
+                            logDebug("FireBase Team could not be saved. " + firebaseError.getMessage());
+                        } else {
+                            logDebug("FireBase Team saved successfully.");
+                        }
+                    }
+                });
+
+        addNewUserToTeam(teamModel, user);
+        goToNextScreen(teamModel, user);
+        super.finish();
+    }
+
+    protected void addNewUserToTeam(TeamModel teamModel, UserTeamModel user) {
+        if (teamModel == null || user == null || StringUtils.isNull(teamModel.team_name))
+            return;
+
+        Firebase ref = FireBaseAction.getFirebaseRef(this);
+        if (ref == null)
+            return;
+
+        if (StringUtils.isNull(user.device_uuid)) {
+            user.device_uuid = DeviceUtils.getDeviceUUID(this);
+        }
+
+        ref.child(LoginActivity.TEAM_GROUP).child(teamModel.team_name).child(Constant.SLUG_USERS)
+                .child(user.device_uuid).setValue(user, new Firebase.CompletionListener() {
+            @Override
+            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                if (firebaseError != null) {
+                    logDebug("FireBase User could not be saved. " + firebaseError.getMessage());
+                } else {
+                    logDebug("FireBase User saved successfully.");
+                }
+            }
+        });
     }
 
     //----------------------------------------------------------------------------------------------

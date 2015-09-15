@@ -6,6 +6,7 @@ import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.lorem_ipsum.utils.DeviceUtils;
@@ -37,7 +38,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         @InjectView(R.id.iv_user_icon)
-        View vIconUser;
+        ImageView ivIconUser;
         @InjectView(R.id.tv_user_name)
         TextView tvUserName;
         @InjectView(R.id.tv_message)
@@ -72,9 +73,11 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         String user = "";
         String userUuid = "";
         String timeStamp = "";
+        boolean isOnl = true;
 
         if (comment != null) {
             message = comment.message;
+            isOnl = comment.user.state;
 
             timeStamp = convertToDateTime(comment.time_stamp);
             if (comment.user != null) {
@@ -91,11 +94,8 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         boolean isMyComment = uuid.equals(userUuid);
         viewHolder.vSpaceLeft.setVisibility(isMyComment ? View.VISIBLE : View.GONE);
         viewHolder.vSpaceRight.setVisibility(isMyComment ? View.GONE : View.VISIBLE);
-        //viewHolder.tvUserName.setVisibility(isMyComment ? View.GONE : View.VISIBLE);
-        //viewHolder.vIconUser.setVisibility(isMyComment ? View.GONE : View.VISIBLE);
-        if (isMyComment) {
-            viewHolder.tvUserName.setText("me");
-        }
+        viewHolder.tvUserName.setText(isMyComment ? "me" : user);
+        viewHolder.ivIconUser.setBackgroundResource(isOnl ? R.mipmap.ic_user_onl : R.mipmap.ic_user_off);
     }
 
     @Override
