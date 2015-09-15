@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 
 import com.lorem_ipsum.utils.DeviceUtils;
 import com.lorem_ipsum.utils.StringUtils;
@@ -29,6 +30,8 @@ public class MainActivity extends TeamBaseActivity implements
     protected static final int DURATION = 300;
     protected static int CommentId = 0;
 
+    @InjectView(R.id.tv_app_title)
+    TextView tvTitle;
     @InjectView(R.id.visualizer)
     VisualizerView mVisualiser;
     @InjectView(R.id.chatting_box)
@@ -71,10 +74,13 @@ public class MainActivity extends TeamBaseActivity implements
     }
 
     protected void initialiseData() {
-        if (mUser == null)
-            return;
+        if (mUser != null) {
+            showLocationWithCamera(mUser.lat, mUser.lng);
+        }
 
-        showLocationWithCamera(mUser.lat, mUser.lng);
+        if (mTeam != null) {
+            tvTitle.setText(mTeam.team_name);
+        }
     }
 
     protected void initialiseUI() {
