@@ -133,7 +133,7 @@ public abstract class TeamBaseActivity extends MapBaseActivity {
     //----------------------------------------------------------------------------------------------
 
     protected abstract void onUserSubscribed(UserTeamModel user);
-    protected abstract void onUserUnSubscribed(UserTeamModel user);
+    protected abstract void onUserInfoChanged(UserTeamModel user);
 
     protected void onChangeUserInfoOrState(UserTeamModel user) {
         if (user == null || mTeam == null || StringUtils.isNull(mTeam.team_name))
@@ -181,7 +181,7 @@ public abstract class TeamBaseActivity extends MapBaseActivity {
         onUserSubscribed(user);
     }
 
-    protected void onUserUnSubscribed(DataSnapshot dataSnapshot) {
+    protected void onUserInfoChanged(DataSnapshot dataSnapshot) {
         UserTeamModel user = null;
         try {
             user = dataSnapshot.getValue(UserTeamModel.class);
@@ -191,7 +191,7 @@ public abstract class TeamBaseActivity extends MapBaseActivity {
         if (user == null)
             return;
 
-        onUserUnSubscribed(user);
+        onUserInfoChanged(user);
     }
 
     public class UsersEventListener implements ChildEventListener {
@@ -205,7 +205,7 @@ public abstract class TeamBaseActivity extends MapBaseActivity {
         @Override
         public void onChildChanged(DataSnapshot dataSnapshot, String s) {
             logDebug("user change: " + dataSnapshot.getValue());
-            onUserUnSubscribed(dataSnapshot);
+            onUserInfoChanged(dataSnapshot);
         }
 
         @Override

@@ -121,24 +121,33 @@ public abstract class MapBaseActivity extends BaseActivity {
         mUsersOnMap.add(userOnMap);
     }
 
-    protected void takeUserOnMapOfflineOrOnline(UserTeamModel user) {
+    protected void changeUserLocationOrState(UserTeamModel user) {
         if (user == null || StringUtils.isNull(user.device_uuid))
             return;
 
         if (mUsersOnMap == null || mUsersOnMap.size() <= 0)
             return;
 
+        UserOnMap userChanged = null;
         for (UserOnMap userOnMap : mUsersOnMap) {
-            if (userOnMap.user == null || StringUtils.isNull(userOnMap.user.device_uuid))
+            if (userOnMap == null || userOnMap.user == null || StringUtils.isNull(userOnMap.user.device_uuid))
                 continue;
 
             if (userOnMap.user.device_uuid.equals(user.device_uuid)) {
-                userOnMap.marker.setIcon(
-                        user.state ? BitmapDescriptorFactory.fromResource(R.mipmap.user_location_onl)
-                                : BitmapDescriptorFactory.fromResource(R.mipmap.user_location_off)
-                );
+                userChanged = userOnMap;
                 break;
             }
         }
+        if (userChanged == null)
+            return;
+
+        //Change user status
+        userChanged.marker.setIcon(
+                user.state ? BitmapDescriptorFactory.fromResource(R.mipmap.user_location_onl)
+                        : BitmapDescriptorFactory.fromResource(R.mipmap.user_location_off)
+        );
+
+        //Change location
+        userChanged.marker.setPosition(new LatLng(user.lat, user.lng));
     }
 }

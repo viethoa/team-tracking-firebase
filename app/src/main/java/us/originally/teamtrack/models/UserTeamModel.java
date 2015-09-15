@@ -1,7 +1,5 @@
 package us.originally.teamtrack.models;
 
-import com.google.android.gms.maps.model.Marker;
-
 import java.io.Serializable;
 
 /**

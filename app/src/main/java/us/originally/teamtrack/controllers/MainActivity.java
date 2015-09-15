@@ -170,6 +170,12 @@ public class MainActivity extends TeamBaseActivity implements
     @Override
     public void onLocationChange(double lat, double lng) {
         showLocationWithCamera(lat, lng);
+        if (mUser == null)
+            return;
+
+        mUser.lat = lat;
+        mUser.lng = lng;
+        onChangeUserInfoOrState(mUser);
     }
 
     //----------------------------------------------------------------------------------------------
@@ -190,11 +196,11 @@ public class MainActivity extends TeamBaseActivity implements
     }
 
     @Override
-    protected void onUserUnSubscribed(UserTeamModel user) {
+    protected void onUserInfoChanged(UserTeamModel user) {
         if (user == null)
             return;
 
-        takeUserOnMapOfflineOrOnline(user);
+        changeUserLocationOrState(user);
     }
 
     //----------------------------------------------------------------------------------------------
