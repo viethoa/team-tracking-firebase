@@ -178,18 +178,23 @@ public class MainActivity extends TeamBaseActivity implements
         onChangeUserInfoOrState(mUser);
     }
 
+    protected boolean validUser(UserTeamModel user) {
+        if (user == null || StringUtils.isNull(user.device_uuid))
+            return false;
+
+        if (mUser == null || StringUtils.isNull(mUser.device_uuid))
+            return false;
+
+        return mUser.device_uuid.equals(user.device_uuid);
+    }
+
     //----------------------------------------------------------------------------------------------
     // Team User section
     //----------------------------------------------------------------------------------------------
 
     @Override
     protected void onUserSubscribed(UserTeamModel user) {
-        if (user == null)
-            return;
-
-        //Do not do by myself
-        if (mUser != null && StringUtils.isNotNull(mUser.device_uuid) && StringUtils.isNotNull(user.device_uuid)
-                && mUser.device_uuid.equals(user.device_uuid))
+        if (user == null || validUser(user))
             return;
 
         addUserToMapWithNoneCamera(user);
@@ -197,7 +202,7 @@ public class MainActivity extends TeamBaseActivity implements
 
     @Override
     protected void onUserInfoChanged(UserTeamModel user) {
-        if (user == null)
+        if (user == null || validUser(user))
             return;
 
         changeUserLocationOrState(user);
@@ -218,7 +223,7 @@ public class MainActivity extends TeamBaseActivity implements
         mChattingBox.pushComment(comment);
 
         //Notify comment in chat box closed
-        if (mChattingBox.getTranslationY() == 0)
+        if (mChattingBox.getTranslationY() == 0f || validUser(comment.user))
             return;
         takeNotifyComment(comment);
     }

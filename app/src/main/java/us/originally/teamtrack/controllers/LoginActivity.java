@@ -91,7 +91,7 @@ public class LoginActivity extends BaseLoginActivity {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    performLogin();
+                    onBtnLoginClicked();
                 }
                 return false;
             }
@@ -124,7 +124,25 @@ public class LoginActivity extends BaseLoginActivity {
 
     @OnClick(R.id.btn_login)
     protected void onBtnLoginClicked() {
-        performLogin();
+        if (!validForm())
+            return;
+
+        if (!DeviceUtils.checkNetworkState(this)) {
+            showToastErrorMessage("Please connect your internet!");
+            return;
+        }
+
+        String id = DeviceUtils.getDeviceUUID(this);
+        String yourName = etName.getText().toString();
+        String teamName = etTeam.getText().toString();
+        String password = takePasswordMd5(etPassword.getText().toString());
+        long timeStamp = System.currentTimeMillis();
+
+        UserTeamModel user = new UserTeamModel(id, yourName, myLat, myLng);
+        TeamModel teamModel = new TeamModel(teamName, password, timeStamp);
+
+        showLoadingDialog();
+        takeLoginOrSubscribe(teamModel, user);
     }
 
     @Override
@@ -135,23 +153,6 @@ public class LoginActivity extends BaseLoginActivity {
         CacheManager.saveStringCacheData(CACHE_TEAM_KEY, teamModel.team_name);
         CacheManager.saveStringCacheData(CACHE_USER_NAME_KEY, user.name);
         startActivity(MainActivity.getInstance(this, teamModel, user));
-    }
-
-    protected void performLogin() {
-        if (!validForm())
-            return;
-
-        String id = DeviceUtils.getDeviceUUID(this);
-        String yourName = etName.getText().toString();
-        String teamName = etTeam.getText().toString();
-        String password = takePasswordMd5(etPassword.getText().toString());
-        long timeStemp = System.currentTimeMillis();
-
-        UserTeamModel user = new UserTeamModel(id, yourName, myLat, myLng);
-        TeamModel teamModel = new TeamModel(teamName, password, timeStemp);
-
-        showLoadingDialog();
-        takeLoginOrSubscribe(teamModel, user);
     }
 
     protected String takePasswordMd5(String password) {
