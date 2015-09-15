@@ -59,12 +59,12 @@ public class MainActivity extends TeamBaseActivity implements
     }
 
     @Override
-    protected void onStart() {
+    public void onResume() {
         if (mUser != null) {
             mUser.state = true;
             onChangeUserInfoOrState(mUser);
         }
-        super.onStart();
+        super.onResume();
     }
 
     @Override
@@ -161,6 +161,7 @@ public class MainActivity extends TeamBaseActivity implements
         if (user == null)
             return;
 
+        //Do not do by myself
         if (mUser != null && StringUtils.isNotNull(mUser.device_uuid) && StringUtils.isNotNull(user.device_uuid)
                 && mUser.device_uuid.equals(user.device_uuid))
             return;
