@@ -59,8 +59,9 @@ public abstract class TeamBaseActivity extends MapBaseActivity {
         if (ref == null)
             return;
 
+        String commentId = comment.time_stamp + "_" + comment.user.device_uuid;
         ref.child(BaseLoginActivity.TEAM_GROUP).child(mTeam.team_name).child(Constant.SLUG_MESSAGE)
-                .child(comment.user.device_uuid).setValue(comment);
+                .child(commentId).setValue(comment);
     }
 
     protected void onMessagePushed(DataSnapshot dataSnapshot) {

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="us.originally.teamtrack" >
+    package="us.originally.teamtrack">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -39,7 +39,7 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
 
         <!-- ==================== start PARSE - REQUIRED ENTRIES ======================== -->
         <meta-data
@@ -66,7 +66,7 @@
             android:name=".controllers.LandingActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/Application_Theme" >
+            android:theme="@style/Application_Theme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -75,56 +75,51 @@
         </activity>
         <activity
             android:name=".controllers.AudioStreamActivity"
-            android:screenOrientation="portrait"
-            android:label="@string/title_activity_audio_stream" >
-        </activity>
+            android:label="@string/title_activity_audio_stream"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".controllers.AudioMessageActivity"
-            android:screenOrientation="portrait"
-            android:label="@string/title_activity_landing" >
-        </activity>
+            android:label="@string/title_activity_landing"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".controllers.MainActivity"
+            android:label="@string/title_activity_main"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustNothing"
-            android:label="@string/title_activity_main" >
-        </activity>
-
+            android:windowSoftInputMode="adjustResize"/>
         <activity
             android:name=".controllers.LoginActivity"
             android:label="@string/title_activity_login"
-            android:windowSoftInputMode="stateVisible" >
-            <service android:name=".services.AudioService" />
-            <!-- Parse push notification -->
-            <service android:name="com.parse.PushService" />
+            android:windowSoftInputMode="stateVisible" />
 
-            <receiver android:name="com.parse.ParseBroadcastReceiver" >
-                <intent-filter>
-                    <action android:name="android.intent.action.BOOT_COMPLETED" />
-                    <action android:name="android.intent.action.USER_PRESENT" />
-                </intent-filter>
-            </receiver>
-            <receiver
-                android:name="com.parse.ParsePushBroadcastReceiver"
-                android:exported="false" >
-                <intent-filter>
-                    <action android:name="com.parse.push.intent.RECEIVE" />
-                    <action android:name="com.parse.push.intent.DELETE" />
-                    <action android:name="com.parse.push.intent.OPEN" />
-                </intent-filter>
-            </receiver>
-            <receiver
-                android:name="com.parse.GcmBroadcastReceiver"
-                android:permission="com.google.android.c2dm.permission.SEND" >
-                <intent-filter>
-                    <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-                    <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+        <service android:name=".services.AudioService" />
+        <!-- Parse push notification -->
+        <service android:name="com.parse.PushService" />
 
-                    <category android:name="us.originally.teamtrack" />
-                </intent-filter>
-            </receiver>
+        <receiver android:name="com.parse.ParseBroadcastReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.USER_PRESENT" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name="com.parse.ParsePushBroadcastReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.parse.push.intent.RECEIVE" />
+                <action android:name="com.parse.push.intent.DELETE" />
+                <action android:name="com.parse.push.intent.OPEN" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name="com.parse.GcmBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
 
-        </activity>
+                <category android:name="us.originally.teamtrack" />
+            </intent-filter>
+        </receiver>
 
     </application>
 

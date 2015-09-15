@@ -27,21 +27,21 @@
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/my_recycler_view"
-        android:layout_below="@id/chat_header"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/chat_header"
         android:layout_marginTop="-1dp"
         android:layout_marginBottom="@dimen/chatting_view_margin_bottom"
-        android:paddingTop="@dimen/small_space"
-        android:paddingBottom="@dimen/small_space"
-        android:background="@color/app_effect_color_light"/>
+        android:background="@color/app_highlight_color"/>
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_alignParentBottom="true"
         android:layout_height="@dimen/chatting_view_margin_bottom"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:focusableInTouchMode="true"
+        android:focusable="true">
 
         <EditText
             android:id="@+id/et_comment"

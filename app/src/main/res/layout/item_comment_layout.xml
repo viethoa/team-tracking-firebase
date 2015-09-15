@@ -13,14 +13,21 @@
     <RelativeLayout
         android:layout_width="@dimen/empty_space"
         android:layout_height="wrap_content"
-        android:padding="@dimen/medium_space"
+        android:padding="@dimen/small_space"
+        android:layout_marginTop="@dimen/medium_space"
+        android:layout_marginBottom="@dimen/medium_space"
+        android:layout_marginLeft="@dimen/small_space"
+        android:layout_marginStart="@dimen/small_space"
+        android:layout_marginRight="@dimen/small_space"
+        android:layout_marginEnd="@dimen/small_space"
         android:background="@drawable/comment_view"
-        android:layout_weight="5">
+        android:layout_weight="3">
 
         <ImageView
             android:id="@+id/iv_user_icon"
             android:layout_width="20dp"
             android:layout_height="20dp"
+            android:layout_marginBottom="@dimen/small_space"
             android:scaleType="centerInside"
             android:src="@mipmap/ic_user"/>
 
@@ -35,15 +42,22 @@
             android:text="user name"/>
 
         <TextView
+            android:id="@+id/tv_time_stamp"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:layout_alignParentRight="true"
+            android:gravity="center_vertical"
+            android:text="12:00"/>
+
+        <TextView
             android:id="@+id/tv_message"
             style="@style/text_view_black_medium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/iv_user_icon"
-            android:layout_marginTop="@dimen/small_space"
             android:layout_marginLeft="@dimen/small_space"
             android:layout_marginStart="@dimen/small_space"
-            android:text="message message message message message"/>
+            android:text="message 1 \nmessage 2"/>
     </RelativeLayout>
 
     <View

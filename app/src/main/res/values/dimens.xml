@@ -21,5 +21,5 @@
     <!-- main activity -->
     <dimen name="footer_height">40dp</dimen>
     <dimen name="chatting_view_margin_bottom">38dp</dimen>
-    <dimen name="chatting_view_margin_top">100dp</dimen>
+    <dimen name="chatting_view_margin_top">80dp</dimen>
 </resources>

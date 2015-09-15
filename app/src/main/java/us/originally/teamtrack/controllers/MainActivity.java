@@ -27,6 +27,7 @@ public class MainActivity extends TeamBaseActivity implements
     private static final String EXTRACT_TEAM = "extrac-team";
     private static final String EXTRACT_USER = "extrac-user";
     protected static final int DURATION = 300;
+    protected static int CommentId = 0;
 
     @InjectView(R.id.visualizer)
     VisualizerView mVisualiser;
@@ -143,6 +144,11 @@ public class MainActivity extends TeamBaseActivity implements
     protected void onShowComment(Comment comment) {
         if (comment == null || StringUtils.isNull(comment.message))
             return;
+
+        if (comment.id > CommentId) {
+            CommentId = comment.id;
+        }
+
         mChattingBox.pushComment(comment);
     }
 
@@ -151,7 +157,9 @@ public class MainActivity extends TeamBaseActivity implements
         if (StringUtils.isNull(comment) || mUser == null)
             return;
 
-        Comment userComment = new Comment(comment, mUser);
+        CommentId += 1;
+        long timeStamp = System.currentTimeMillis();
+        Comment userComment = new Comment(CommentId, timeStamp, comment, mUser);
         pushComment(userComment);
     }
 }

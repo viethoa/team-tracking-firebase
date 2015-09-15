@@ -13,6 +13,7 @@ import android.widget.RelativeLayout;
 import com.lorem_ipsum.utils.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -79,11 +80,12 @@ public class ChattingView extends RelativeLayout {
 
     protected void initialiseData() {
         mDataArray = new ArrayList<>();
-        mAdapter = new CommentAdapter(mDataArray);
+        mAdapter = new CommentAdapter(getContext(), mDataArray);
     }
 
     protected void initialiseUI() {
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext());
+        mLayoutManager.setStackFromEnd(true);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
@@ -94,20 +96,49 @@ public class ChattingView extends RelativeLayout {
     //----------------------------------------------------------------------------------------------
 
     public void pushComment(Comment comment) {
-        if (comment == null || StringUtils.isNull(comment.message))
-            return;
-
-        if (mDataArray == null) {
-            mDataArray = new ArrayList<>();
-        }
-
-        mDataArray.add(comment);
+        //Add new comment
+        handleAddNewMessage(comment);
         mAdapter.refreshDataChange(mDataArray);
+
+        //Scroll to bottom
+        int bottomPosition = mAdapter.getItemCount() - 1;
+        if (bottomPosition < 0)
+            bottomPosition = 0;
+        mRecyclerView.smoothScrollToPosition(bottomPosition);
     }
 
     //----------------------------------------------------------------------------------------------
     // Event
     //----------------------------------------------------------------------------------------------
+
+    protected void handleAddNewMessage(Comment comment) {
+        if (comment == null || StringUtils.isNull(comment.message))
+            return;
+
+        if (mDataArray == null || mDataArray.size() <= 0) {
+            mDataArray = new ArrayList<>();
+            mDataArray.add(comment);
+            return;
+        }
+
+        int lastIndex = mDataArray.size() - 1;
+        Comment lastComment = mDataArray.get(lastIndex);
+        if (lastComment == null || lastComment.user == null || comment.user == null ||
+                StringUtils.isNull(comment.user.device_uuid) || StringUtils.isNull(lastComment.user.device_uuid)) {
+            mDataArray.add(comment);
+            Collections.sort(mDataArray);
+            return;
+        }
+
+        if (comment.user.device_uuid.equals(lastComment.user.device_uuid)) {
+            lastComment.message += "\n\n" + comment.message;
+            Collections.sort(mDataArray);
+            return;
+        }
+
+        mDataArray.add(comment);
+        Collections.sort(mDataArray);
+    }
 
     @OnClick(R.id.header_box)
     protected void onHeaderClicked() {
