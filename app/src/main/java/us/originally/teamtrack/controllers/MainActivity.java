@@ -26,6 +26,7 @@ public class MainActivity extends TeamBaseActivity implements
 
     private static final String EXTRACT_TEAM = "extrac-team";
     private static final String EXTRACT_USER = "extrac-user";
+    protected static final int NOTIFY_COMMENT_DELAY = 3000;
     protected static final int DURATION = 300;
     protected static int CommentId = 0;
 
@@ -35,6 +36,12 @@ public class MainActivity extends TeamBaseActivity implements
     VisualizerView mVisualiser;
     @InjectView(R.id.chatting_box)
     ChattingView mChattingBox;
+    @InjectView(R.id.ll_comment_notify)
+    View mNotifyCommentBox;
+    @InjectView(R.id.tv_user_name)
+    TextView tvUserName;
+    @InjectView(R.id.tv_user_comment)
+    TextView tvUserComment;
     @InjectView(R.id.ll_footer)
     View mFooter;
 
@@ -107,11 +114,20 @@ public class MainActivity extends TeamBaseActivity implements
         float height = DeviceUtils.getDeviceScreenHeight(this);
         mChattingBox.setTranslationY(height);
 
+        //Notify message box
+        float width = DeviceUtils.getDeviceScreenWidth(this);
+        mNotifyCommentBox.setTranslationX(width);
+        mNotifyCommentBox.setAlpha(0f);
     }
 
     //----------------------------------------------------------------------------------------------
     // Event
     //----------------------------------------------------------------------------------------------
+
+    @OnClick(R.id.ll_comment_notify)
+    protected void onNotifyCommentBoxClicked() {
+        onBtnOpenChatBoxClicked();
+    }
 
     @OnClick(R.id.btn_open_chat_box)
     protected void onBtnOpenChatBoxClicked() {
@@ -189,8 +205,13 @@ public class MainActivity extends TeamBaseActivity implements
         if (comment.id > CommentId) {
             CommentId = comment.id;
         }
-
         mChattingBox.pushComment(comment);
+
+        //Notify comment in chat box closed
+        float translateY = mChattingBox.getTranslationY();
+        if (translateY == 0)
+            return;
+        takeNotifyComment(comment);
     }
 
     @Override
@@ -202,5 +223,28 @@ public class MainActivity extends TeamBaseActivity implements
         long timeStamp = System.currentTimeMillis();
         Comment userComment = new Comment(CommentId, timeStamp, comment, mUser);
         pushComment(userComment);
+    }
+
+    protected void takeNotifyComment(Comment comment) {
+        if (comment == null)
+            return;
+
+        if (comment.user != null && StringUtils.isNotNull(comment.user.name))
+            tvUserName.setText(comment.user.name + ":");
+
+        if (comment.user != null && StringUtils.isNotNull(comment.message))
+            tvUserComment.setText(comment.message);
+
+        final float screenWidth = DeviceUtils.getDeviceScreenWidth(this);
+        mNotifyCommentBox.animate().translationX(0f).start();
+        mNotifyCommentBox.animate().alpha(1f).start();
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mNotifyCommentBox.animate().translationX(screenWidth).start();
+                mNotifyCommentBox.animate().alpha(0f).start();
+            }
+        }, NOTIFY_COMMENT_DELAY);
     }
 }

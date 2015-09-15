@@ -79,6 +79,34 @@
             android:src="@mipmap/ic_comment" />
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/ll_comment_notify"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/toolbar"
+        android:layout_marginTop="@dimen/medium_space"
+        android:layout_marginLeft="@dimen/small_space"
+        android:layout_marginStart="@dimen/small_space"
+        android:background="@drawable/notify_comment_bg"
+        android:padding="@dimen/small_space">
+
+        <TextView
+            android:id="@+id/tv_user_name"
+            style="@style/text_view_bright_small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/small_space"
+            android:text="user:"/>
+
+        <TextView
+            android:id="@+id/tv_user_comment"
+            style="@style/text_view_bright_small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="message"/>
+    </LinearLayout>
+
     <us.originally.teamtrack.customviews.ChattingView
         android:id="@+id/chatting_box"
         android:layout_width="match_parent"

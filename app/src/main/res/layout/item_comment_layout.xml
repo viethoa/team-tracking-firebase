@@ -20,7 +20,7 @@
         android:layout_marginStart="@dimen/small_space"
         android:layout_marginRight="@dimen/small_space"
         android:layout_marginEnd="@dimen/small_space"
-        android:background="@drawable/comment_view"
+        android:background="@drawable/comment_bg"
         android:layout_weight="3">
 
         <ImageView
