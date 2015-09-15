@@ -2,6 +2,8 @@ package us.originally.teamtrack.controllers;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -9,6 +11,8 @@ import android.widget.TextView;
 
 import com.lorem_ipsum.utils.DeviceUtils;
 import com.lorem_ipsum.utils.StringUtils;
+
+import java.io.IOException;
 
 import butterknife.InjectView;
 import butterknife.OnClick;
@@ -208,8 +212,7 @@ public class MainActivity extends TeamBaseActivity implements
         mChattingBox.pushComment(comment);
 
         //Notify comment in chat box closed
-        float translateY = mChattingBox.getTranslationY();
-        if (translateY == 0)
+        if (mChattingBox.getTranslationY() == 0)
             return;
         takeNotifyComment(comment);
     }
@@ -235,10 +238,23 @@ public class MainActivity extends TeamBaseActivity implements
         if (comment.user != null && StringUtils.isNotNull(comment.message))
             tvUserComment.setText(comment.message);
 
+        //Take sound
+        try {
+            AssetFileDescriptor afd = getAssets().openFd("sounds/comment_notify_sound.mp3");
+            MediaPlayer player = new MediaPlayer();
+            player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+            player.prepare();
+            player.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //Take notify box
         final float screenWidth = DeviceUtils.getDeviceScreenWidth(this);
         mNotifyCommentBox.animate().translationX(0f).start();
         mNotifyCommentBox.animate().alpha(1f).start();
 
+        //Hidden notify box
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
