@@ -95,7 +95,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         viewHolder.vSpaceLeft.setVisibility(isMyComment ? View.VISIBLE : View.GONE);
         viewHolder.vSpaceRight.setVisibility(isMyComment ? View.GONE : View.VISIBLE);
         viewHolder.tvUserName.setText(isMyComment ? "me" : user);
-        viewHolder.ivIconUser.setBackgroundResource(isOnl ? R.mipmap.ic_user_onl : R.mipmap.ic_user_off);
+        viewHolder.ivIconUser.setImageResource(isOnl ? R.mipmap.ic_user_onl : R.mipmap.ic_user_off);
     }
 
     @Override
