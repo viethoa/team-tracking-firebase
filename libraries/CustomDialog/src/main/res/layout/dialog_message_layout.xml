@@ -18,6 +18,7 @@
         android:layout_height="wrap_content"
         android:padding="@dimen/xlarge_space"
         android:textSize="@dimen/font_medium"
+        android:textColor="@color/text_color_dark"
         android:background="@color/dialog_bg_color"
         android:text="my message"/>
 

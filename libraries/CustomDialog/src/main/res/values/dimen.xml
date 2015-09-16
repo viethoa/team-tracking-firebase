@@ -9,9 +9,8 @@
     <dimen name="xlarge_space">20dp</dimen>
     <dimen name="xxlarge_space">25dp</dimen>
 
-    <dimen name="font_small">12dp</dimen>
-    <dimen name="font_medium">15dp</dimen>
-    <dimen name="font_large">18dp</dimen>
-    <dimen name="font_x_large">24dp</dimen>
-    <dimen name="font_no_data_view">16dp</dimen>
+    <dimen name="font_small">12sp</dimen>
+    <dimen name="font_medium">15sp</dimen>
+    <dimen name="font_large">18sp</dimen>
+    <dimen name="font_x_large">24sp</dimen>
 </resources>
