@@ -6,8 +6,8 @@
 
     <View
         android:id="@+id/view_speak"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
+        android:layout_width="@dimen/waveform_btn_size"
+        android:layout_height="@dimen/waveform_btn_size"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="@dimen/medium_space"
@@ -15,8 +15,8 @@
 
     <ImageView
         android:id="@+id/view_background"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
+        android:layout_width="@dimen/waveform_btn_size"
+        android:layout_height="@dimen/waveform_btn_size"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="@dimen/medium_space"
@@ -24,8 +24,8 @@
     
     <ImageView
         android:id="@+id/btn_speak"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
+        android:layout_width="@dimen/waveform_btn_size"
+        android:layout_height="@dimen/waveform_btn_size"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="@dimen/medium_space"

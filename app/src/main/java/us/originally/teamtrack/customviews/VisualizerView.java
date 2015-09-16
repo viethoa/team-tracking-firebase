@@ -173,7 +173,8 @@ public class VisualizerView extends RelativeLayout {
 
             isStopRecording = true;
             vBackground.setColorFilter(null);
-            animationSpeaking(NORMAL_SCALE, 50);
+            vAnimationSpeaking.animate().scaleX(NORMAL_SCALE).start();
+            vAnimationSpeaking.animate().scaleY(NORMAL_SCALE).start();
         }
     }
 }

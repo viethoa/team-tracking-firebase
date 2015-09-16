@@ -16,6 +16,8 @@ import java.io.IOException;
 
 import butterknife.InjectView;
 import butterknife.OnClick;
+import de.greenrobot.event.EventBus;
+import us.originally.teamtrack.EventBus.VisualizeEvent;
 import us.originally.teamtrack.R;
 import us.originally.teamtrack.controllers.base.TeamBaseActivity;
 import us.originally.teamtrack.customviews.ChattingView;
@@ -24,6 +26,7 @@ import us.originally.teamtrack.managers.GPSTrackerManager;
 import us.originally.teamtrack.models.Comment;
 import us.originally.teamtrack.models.TeamModel;
 import us.originally.teamtrack.models.UserTeamModel;
+import us.originally.teamtrack.modules.chat.audio.AudioStreamManager;
 
 public class MainActivity extends TeamBaseActivity implements
         GPSTrackerManager.GPSListener, ChattingView.ChattingViewListener {
@@ -33,6 +36,9 @@ public class MainActivity extends TeamBaseActivity implements
     protected static final int NOTIFY_COMMENT_DELAY = 3000;
     protected static final int DURATION = 300;
     protected static int CommentId = 0;
+
+    protected GPSTrackerManager mGpsTracker;
+    protected EventBus eventBus;
 
     @InjectView(R.id.tv_app_title)
     TextView tvTitle;
@@ -70,6 +76,18 @@ public class MainActivity extends TeamBaseActivity implements
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        eventBus.getDefault().register(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        eventBus.getDefault().unregister(this);
+    }
+
+    @Override
     public void onResume() {
         if (mUser != null) {
             mUser.state = true;
@@ -92,13 +110,23 @@ public class MainActivity extends TeamBaseActivity implements
     //----------------------------------------------------------------------------------------------
 
     @Override
-    protected void initialiseTeamData() {
+    protected void extractTeamAndUserModel() {
         Bundle bundle = getIntent().getExtras();
         if (bundle == null)
             return;
 
+        //Extract data
         mUser = (UserTeamModel) bundle.getSerializable(EXTRACT_USER);
         mTeam = (TeamModel) bundle.getSerializable(EXTRACT_TEAM);
+        if (mUser == null)
+            return;
+
+        //Set user position again
+        mGpsTracker = new GPSTrackerManager(this, getFragmentManager());
+        if (mGpsTracker.canGetLocation()) {
+            mUser.lat = mGpsTracker.getLatitude();
+            mUser.lng = mGpsTracker.getLongitude();
+        }
     }
 
     protected void initialiseData() {
@@ -122,6 +150,9 @@ public class MainActivity extends TeamBaseActivity implements
         float width = DeviceUtils.getDeviceScreenWidth(this);
         mNotifyCommentBox.setTranslationX(width);
         mNotifyCommentBox.setAlpha(0f);
+
+        //Waveform
+        mVisualiser.setOnSpeakListener(this);
     }
 
     //----------------------------------------------------------------------------------------------
@@ -273,5 +304,35 @@ public class MainActivity extends TeamBaseActivity implements
                 mNotifyCommentBox.animate().alpha(0f).start();
             }
         }, NOTIFY_COMMENT_DELAY);
+    }
+
+    //----------------------------------------------------------------------------------------------
+    // Team audio section
+    //----------------------------------------------------------------------------------------------
+
+    public void onEventMainThread(VisualizeEvent event) {
+        if (event == null)
+            return;
+
+        logDebug("sound value: " + event.getSoudValue());
+        mVisualiser.OnSpeaking(event.getSoudValue());
+    }
+
+    @Override
+    public void onEntered() {
+        if (AudioStreamManager.isRecording() || mTeam == null || mUser == null)
+            return;
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                AudioStreamManager.startRecording(MainActivity.this, mTeam, mUser);
+            }
+        }).start();
+    }
+
+    @Override
+    public void onLeaved() {
+        AudioStreamManager.stopRecording();
     }
 }

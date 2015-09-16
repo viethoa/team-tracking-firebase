@@ -12,15 +12,10 @@ import com.lorem_ipsum.utils.DeviceUtils;
 import com.lorem_ipsum.utils.StringUtils;
 
 import de.greenrobot.event.EventBus;
-import us.originally.teamtrack.Constant;
 import us.originally.teamtrack.EventBus.MessageEvent;
 import us.originally.teamtrack.R;
-import us.originally.teamtrack.controllers.LoginActivity;
-import us.originally.teamtrack.models.TeamModel;
-import us.originally.teamtrack.models.UserTeamModel;
 import us.originally.teamtrack.modules.chat.MessageModel;
 import us.originally.teamtrack.modules.chat.audio.AudioModel;
-import us.originally.teamtrack.modules.chat.audio.AudioStreamManager;
 
 
 /**
@@ -99,14 +94,8 @@ public class FireBaseAction {
             eventBus = new EventBus();
 
         //-------------------------------------------------------
-        //  Audio stream case
-        if (onReceiveAudio(dataSnapshot))
-            return;
-
-        //-------------------------------------------------------
         //  Audio message case
         onReceiveMessage(dataSnapshot);
-
     }
 
     //----------------------------------------------------------------------------------------------
@@ -160,49 +149,6 @@ public class FireBaseAction {
         }
 
         return isNotNull;
-    }
-
-    //----------------------------------------------------------------------------------------------
-    // Stream section
-    //----------------------------------------------------------------------------------------------
-
-    public static void pushAudio(Context context, String channelName, AudioModel audioModel) {
-        if (!isAudioValid(audioModel))
-            return;
-
-        Firebase ref = getFirebaseRef(context);
-        if (ref == null)
-            return;
-
-        String audioId = "audio_" + audioModel.timestamp;
-        ref.child(channelName).child(audioId).setValue(audioModel, new Firebase.CompletionListener() {
-            @Override
-            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-                if (firebaseError != null) {
-                    Log.e(TAG, "FireBase audio could not be saved. " + firebaseError.getMessage());
-                } else {
-                    Log.e(TAG, "FireBase audio saved successfully.");
-                }
-            }
-        });
-    }
-
-    protected static boolean onReceiveAudio(DataSnapshot dataSnapshot) {
-        AudioModel audio = null;
-        try {
-            audio = dataSnapshot.getValue(AudioModel.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (audio == null)
-            return false;
-
-        //Do not play audio by myself
-        if (myUUID.equals(audio.uuid))
-            return true;
-
-        AudioStreamManager.startPlaying(audio);
-        return true;
     }
 
     protected static boolean isAudioValid(AudioModel audio) {

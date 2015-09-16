@@ -8,8 +8,6 @@ import android.media.MediaRecorder;
 import android.util.Base64;
 import android.util.Log;
 
-import com.lorem_ipsum.utils.DeviceUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,8 +30,6 @@ public class AudioRecordManager {
     private static int minBufSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat);
     private static int bufferSize = 4096;
 
-    private static String uuid = null;
-    private static int audioTimeStamp = 0;
     private static CMG711 uLawCodec = new CMG711();
     public static ArrayList<AudioModel> AudiosEndCoded;
 
@@ -93,10 +89,7 @@ public class AudioRecordManager {
         mRecorder.startRecording();
 
         isRecording = true;
-        audioTimeStamp = 0;
-        if (uuid == null) {
-            uuid = DeviceUtils.getDeviceUUID(context);
-        }
+        int audioTimeStamp = 0;
 
         //Encoding:
         Log.d(LOG_TAG, String.valueOf(minBufSize));
@@ -123,7 +116,7 @@ public class AudioRecordManager {
             String strEncoded = Base64.encodeToString(outBuffer, 2);
 
             //Capture audio
-            AudioModel item = new AudioModel(strEncoded, size, String.valueOf(audioTimeStamp), uuid);
+            AudioModel item = new AudioModel(strEncoded, size, String.valueOf(audioTimeStamp), null);
             AudiosEndCoded.add(item);
         }
     }

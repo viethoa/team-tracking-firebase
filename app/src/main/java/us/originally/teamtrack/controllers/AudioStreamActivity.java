@@ -51,7 +51,7 @@ public class AudioStreamActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                AudioStreamManager.startRecording(AudioStreamActivity.this);
+                //AudioStreamManager.startRecording(AudioStreamActivity.this);
             }
         }).start();
     }

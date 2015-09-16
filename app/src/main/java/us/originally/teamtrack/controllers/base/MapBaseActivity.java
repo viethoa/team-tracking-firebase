@@ -109,7 +109,10 @@ public abstract class MapBaseActivity extends BaseActivity {
         userOnMap.marker = map.addMarker(new MarkerOptions()
                         .position(latLng)
                         .title(user.name)
-                        .icon(BitmapDescriptorFactory.fromResource(R.mipmap.user_location_onl))
+                        .icon( user.state
+                                   ? BitmapDescriptorFactory.fromResource(R.mipmap.user_location_onl)
+                                   : BitmapDescriptorFactory.fromResource(R.mipmap.user_location_off)
+                        )
         );
 
         //Show marker title always

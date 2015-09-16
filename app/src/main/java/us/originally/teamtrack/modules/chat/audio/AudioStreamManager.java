@@ -8,10 +8,11 @@ import android.media.MediaRecorder;
 import android.util.Base64;
 import android.util.Log;
 
-import com.lorem_ipsum.utils.DeviceUtils;
-
-import us.originally.teamtrack.controllers.AudioStreamActivity;
-import us.originally.teamtrack.modules.firebase.FireBaseAction;
+import de.greenrobot.event.EventBus;
+import us.originally.teamtrack.EventBus.VisualizeEvent;
+import us.originally.teamtrack.controllers.base.TeamBaseActivity;
+import us.originally.teamtrack.models.TeamModel;
+import us.originally.teamtrack.models.UserTeamModel;
 
 /**
  * Created by VietHoa on 07/09/15.
@@ -27,9 +28,8 @@ public class AudioStreamManager {
     private static int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
     private static int minBufSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat);
 
-    private static int audioTimeStamp = 0;
-    private static String uuid = null;
     private static CMG711 uLawCodec = new CMG711();
+    private static EventBus eventBus = new EventBus();
 
     //**********************************************************************************************
     //  Player
@@ -70,14 +70,14 @@ public class AudioStreamManager {
     //  Recorder
     //**********************************************************************************************
 
-    public static void startRecording(Context context) {
+    public static boolean isRecording() {
+        return mPlayer != null;
+    }
+
+    public static void startRecording(Context context, TeamModel team, UserTeamModel user) {
         mRecorder = new AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, channelConfig, audioFormat, minBufSize * 10);
         mRecorder.startRecording();
-        audioTimeStamp = 0;
-
-        if (uuid == null) {
-            uuid = DeviceUtils.getDeviceUUID(context);
-        }
+        int audioTimeStamp = 0;
 
         //Encoding:
         byte[] buffer = new byte[10240];
@@ -89,6 +89,10 @@ public class AudioStreamManager {
             audioTimeStamp += 1;
             size = mRecorder.read(buffer, 0, buffer.length);
 
+            //Take audio waveform
+            float soundValue = calculatePowerDb(buffer, size);
+            eventBus.getDefault().post(new VisualizeEvent(soundValue));
+
             //uLaw Encoding:
             uLawCodec.encode(buffer, 0, size, outBuffer);
 
@@ -96,8 +100,8 @@ public class AudioStreamManager {
             String strEncoded = Base64.encodeToString(outBuffer, 2);
 
             //Stream audio data
-            AudioModel audio = new AudioModel(strEncoded, size, String.valueOf(audioTimeStamp), uuid);
-            FireBaseAction.pushAudio(context, AudioStreamActivity.AUDIO_CHANNEL, audio);
+            AudioModel audio = new AudioModel(strEncoded, size, String.valueOf(audioTimeStamp), user);
+            TeamBaseActivity.pushAudio(context, audio, team);
         }
     }
 
@@ -110,5 +114,20 @@ public class AudioStreamManager {
         mRecorder = null;
 
         Log.d(LOG_TAG, "encode: stop");
+    }
+
+    protected static float calculatePowerDb(byte[] buffer, int readSize) {
+        if (readSize <= 0)
+            return 0;
+
+        float max = 0;
+        for (int i = 0; i < readSize; i+=2) {
+            int intSample = (buffer[i+1] << 8) | (buffer[i]) & 0xFF;
+            float floatSample = intSample / 32767.0f;
+            floatSample = Math.abs(floatSample);
+            max = Math.max(floatSample, max);
+        }
+
+        return max;
     }
 }

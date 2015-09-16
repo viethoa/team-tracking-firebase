@@ -9,7 +9,6 @@ import com.lorem_ipsum.utils.DeviceUtils;
 import com.lorem_ipsum.utils.StringUtils;
 
 import us.originally.teamtrack.Constant;
-import us.originally.teamtrack.controllers.LoginActivity;
 import us.originally.teamtrack.models.TeamModel;
 import us.originally.teamtrack.models.UserTeamModel;
 import us.originally.teamtrack.modules.firebase.FireBaseAction;
@@ -19,7 +18,6 @@ import us.originally.teamtrack.modules.firebase.FireBaseAction;
  */
 public abstract class BaseLoginActivity extends BaseActivity {
 
-    public static final String TEAM_GROUP = "Team_Group";
     protected TeamValueListener mTeamValueListener;
 
     protected abstract void goToNextScreen(TeamModel teamModel, UserTeamModel user);
@@ -40,7 +38,7 @@ public abstract class BaseLoginActivity extends BaseActivity {
             return;
         }
 
-        ref = ref.child(TEAM_GROUP).child(teamModel.team_name);
+        ref = ref.child(Constant.TEAM_GROUP).child(teamModel.team_name);
         mTeamValueListener = new TeamValueListener(ref, teamModel, user);
         ref.addValueEventListener(mTeamValueListener);
     }
@@ -80,7 +78,7 @@ public abstract class BaseLoginActivity extends BaseActivity {
         if (ref == null)
             return;
 
-        ref.child(LoginActivity.TEAM_GROUP).child(teamModel.team_name)
+        ref.child(Constant.TEAM_GROUP).child(teamModel.team_name)
                 .setValue(teamModel, new Firebase.CompletionListener() {
                     @Override
                     public void onComplete(FirebaseError firebaseError, Firebase firebase) {
@@ -109,7 +107,7 @@ public abstract class BaseLoginActivity extends BaseActivity {
             user.device_uuid = DeviceUtils.getDeviceUUID(this);
         }
 
-        ref.child(LoginActivity.TEAM_GROUP).child(teamModel.team_name).child(Constant.SLUG_USERS)
+        ref.child(Constant.TEAM_GROUP).child(teamModel.team_name).child(Constant.SLUG_USERS)
                 .child(user.device_uuid).setValue(user, new Firebase.CompletionListener() {
             @Override
             public void onComplete(FirebaseError firebaseError, Firebase firebase) {
