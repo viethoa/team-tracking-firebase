@@ -32,7 +32,7 @@
             android:id="@+id/btn_negative"
             style="@style/dialog_button_negative"
             android:layout_weight="1"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:visibility="visible"
             android:text="Cancel"/>
@@ -41,7 +41,7 @@
             android:id="@+id/btn_positive"
             style="@style/dialog_button_positive"
             android:layout_weight="1"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:visibility="visible"
             android:text="Yes"/>

@@ -121,6 +121,31 @@ public abstract class MapBaseActivity extends BaseActivity {
         mUsersOnMap.add(userOnMap);
     }
 
+    protected void removeUserFromMap(UserTeamModel user) {
+        if (user == null || StringUtils.isNull(user.device_uuid))
+            return;
+
+        if (mUsersOnMap == null || mUsersOnMap.size() <= 0)
+            return;
+
+        UserOnMap userRemoved = null;
+        for (UserOnMap userOnMap : mUsersOnMap) {
+            if (userOnMap == null || userOnMap.user == null || StringUtils.isNull(userOnMap.user.device_uuid))
+                continue;
+
+            if (userOnMap.user.device_uuid.equals(user.device_uuid)) {
+                userRemoved = userOnMap;
+                break;
+            }
+        }
+        if (userRemoved == null || userRemoved.marker == null)
+            return;
+
+        //Change location
+        userRemoved.marker.remove();
+        mUsersOnMap.remove(userRemoved);
+    }
+
     protected void changeUserLocation(UserTeamModel user) {
         if (user == null || StringUtils.isNull(user.device_uuid))
             return;

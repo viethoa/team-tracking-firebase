@@ -123,8 +123,8 @@ public abstract class TeamBaseActivity extends MapBaseActivity implements
     //----------------------------------------------------------------------------------------------
 
     protected abstract void onUserSubscribed(UserTeamModel user);
-
     protected abstract void onUserInfoChanged(UserTeamModel user);
+    protected abstract void onUserMoveOut(UserTeamModel user);
 
     protected void initialiseTeamUser() {
         if (mTeam == null || StringUtils.isNull(mTeam.team_name))
@@ -164,6 +164,19 @@ public abstract class TeamBaseActivity extends MapBaseActivity implements
         onUserInfoChanged(user);
     }
 
+    protected void onUserMoveOut(DataSnapshot dataSnapshot) {
+        UserTeamModel user = null;
+        try {
+            user = dataSnapshot.getValue(UserTeamModel.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (user == null)
+            return;
+
+        onUserMoveOut(user);
+    }
+
     public static void onUpdateUserInfo(Context context, TeamModel team, UserTeamModel user) {
         if (user == null || team == null || StringUtils.isNull(team.team_name))
             return;
@@ -185,7 +198,7 @@ public abstract class TeamBaseActivity extends MapBaseActivity implements
         });
     }
 
-    protected void reemoveUserFromTeam(UserTeamModel user) {
+    protected void removeUserFromTeam(UserTeamModel user) {
         if (user == null || StringUtils.isNull(user.device_uuid))
             return;
         if (mTeam == null || StringUtils.isNull(mTeam.team_name))
@@ -223,7 +236,8 @@ public abstract class TeamBaseActivity extends MapBaseActivity implements
 
         @Override
         public void onChildRemoved(DataSnapshot dataSnapshot) {
-
+            logDebug("user change: " + dataSnapshot.getValue());
+            onUserMoveOut(dataSnapshot);
         }
 
         @Override

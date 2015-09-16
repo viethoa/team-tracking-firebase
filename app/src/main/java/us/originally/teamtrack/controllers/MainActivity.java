@@ -228,7 +228,7 @@ public class MainActivity extends TeamBaseActivity implements
     }
 
     protected void performLogout() {
-        reemoveUserFromTeam(mUser);
+        removeUserFromTeam(mUser);
     }
 
     protected boolean validUser(UserTeamModel user) {
@@ -259,6 +259,14 @@ public class MainActivity extends TeamBaseActivity implements
             return;
 
         changeUserLocation(user);
+    }
+
+    @Override
+    protected void onUserMoveOut(UserTeamModel user) {
+        if (user == null || validUser(user))
+            return;
+
+        removeUserFromMap(user);
     }
 
     //----------------------------------------------------------------------------------------------
