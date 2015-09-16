@@ -39,7 +39,8 @@ public class LandingActivity extends MapBaseActivity implements GPSTrackerManage
     //----------------------------------------------------------------------------------------------
 
     protected void initialiseGPS() {
-        mGpsTracker = new GPSTrackerManager(this, getFragmentManager());
+        mGpsTracker = new GPSTrackerManager(this);
+        mGpsTracker.setOnGPSListener(this);
         if (!mGpsTracker.canGetLocation()) {
             mGpsTracker.showSettingsAlert(this);
         } else {

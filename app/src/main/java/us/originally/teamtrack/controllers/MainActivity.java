@@ -27,12 +27,13 @@ import us.originally.teamtrack.models.Comment;
 import us.originally.teamtrack.models.TeamModel;
 import us.originally.teamtrack.models.UserTeamModel;
 import us.originally.teamtrack.modules.chat.audio.AudioStreamManager;
+import us.originally.teamtrack.services.TrackingLocationService;
 
 public class MainActivity extends TeamBaseActivity implements
         GPSTrackerManager.GPSListener, ChattingView.ChattingViewListener {
 
-    private static final String EXTRACT_TEAM = "extrac-team";
-    private static final String EXTRACT_USER = "extrac-user";
+    public static final String EXTRACT_TEAM = "extrac-team";
+    public static final String EXTRACT_USER = "extrac-user";
     protected static final int NOTIFY_COMMENT_DELAY = 3000;
     protected static final int DURATION = 300;
     protected static int CommentId = 0;
@@ -89,18 +90,18 @@ public class MainActivity extends TeamBaseActivity implements
 
     @Override
     public void onResume() {
-        if (mUser != null) {
+        if (mUser != null && mTeam != null) {
             mUser.state = true;
-            onChangeUserInfoOrState(mUser);
+            onChangeUserInfoOrState(this, mTeam, mUser);
         }
         super.onResume();
     }
 
     @Override
     public void onBackPressed() {
-        if (mUser != null) {
+        if (mUser != null && mTeam != null) {
             mUser.state = false;
-            onChangeUserInfoOrState(mUser);
+            onChangeUserInfoOrState(this, mTeam, mUser);
         }
         super.onBackPressed();
     }
@@ -118,29 +119,34 @@ public class MainActivity extends TeamBaseActivity implements
         //Extract data
         mUser = (UserTeamModel) bundle.getSerializable(EXTRACT_USER);
         mTeam = (TeamModel) bundle.getSerializable(EXTRACT_TEAM);
-        if (mUser == null)
+        if (mUser == null || mTeam == null) {
+            finish();
             return;
+        }
 
         //Set user position again
-        mGpsTracker = new GPSTrackerManager(this, getFragmentManager());
+        mGpsTracker = new GPSTrackerManager(this);
+        mGpsTracker.setOnGPSListener(this);
         if (mGpsTracker.canGetLocation()) {
             mUser.lat = mGpsTracker.getLatitude();
             mUser.lng = mGpsTracker.getLongitude();
         }
+
+        //Start tracking location service
+        Intent intent = new Intent(this, TrackingLocationService.class);
+        intent.putExtra(EXTRACT_TEAM, mTeam);
+        intent.putExtra(EXTRACT_USER, mUser);
+        startService(intent);
     }
 
     protected void initialiseData() {
-        if (mUser != null) {
+        if (mUser != null)
             showLocationWithCamera(mUser.lat, mUser.lng);
-        }
-
-        if (mTeam != null) {
+        if (mTeam != null)
             tvTitle.setText(mTeam.team_name);
-        }
     }
 
     protected void initialiseUI() {
-
         //Chatting box
         mChattingBox.setOnChattingListener(this);
         float height = DeviceUtils.getDeviceScreenHeight(this);
@@ -201,12 +207,12 @@ public class MainActivity extends TeamBaseActivity implements
     @Override
     public void onLocationChange(double lat, double lng) {
         showLocationWithCamera(lat, lng);
-        if (mUser == null)
+        if (mUser == null || mTeam == null)
             return;
 
         mUser.lat = lat;
         mUser.lng = lng;
-        onChangeUserInfoOrState(mUser);
+        onChangeUserInfoOrState(this, mTeam, mUser);
     }
 
     protected boolean validUser(UserTeamModel user) {

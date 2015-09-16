@@ -1,13 +1,10 @@
 package us.originally.teamtrack.managers;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
-import android.app.FragmentManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -32,8 +29,7 @@ import us.originally.teamtrack.R;
 public class GPSTrackerManager extends Service implements LocationListener {
     private final String TAG = "GPS";
 
-    private Activity mContext;
-    private FragmentManager fragmentManager;
+    private Context mContext;
     private GPSListener listener;
     public DialogUtils dialogUtils;
 
@@ -62,9 +58,11 @@ public class GPSTrackerManager extends Service implements LocationListener {
         void onLocationChange(double lat, double lng);
     }
 
-    public GPSTrackerManager(Activity context, FragmentManager fragmentManager) {
-        this.fragmentManager = fragmentManager;
-        this.listener = (GPSListener) context;
+    public void setOnGPSListener(GPSListener listener) {
+        this.listener = listener;
+    }
+
+    public GPSTrackerManager(Context context) {
         this.mContext = context;
         getLocation();
     }

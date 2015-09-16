@@ -91,6 +91,7 @@
             android:label="@string/title_activity_login"
             android:windowSoftInputMode="stateVisible" />
 
+        <service android:name=".services.TrackingLocationService" />
         <service android:name=".services.AudioService" />
         <!-- Parse push notification -->
         <service android:name="com.parse.PushService" />

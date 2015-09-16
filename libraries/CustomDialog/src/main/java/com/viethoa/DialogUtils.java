@@ -136,7 +136,7 @@ public class DialogUtils extends DialogFragment {
     /**
      * Simple dialog
      */
-    public static Dialog createSimpleDialog(Activity activity, View customView, boolean cancelable) {
+    public static Dialog createSimpleDialog(Context activity, View customView, boolean cancelable) {
         if (activity == null || customView == null) {
             Log.d("DialogUtil", "activity or layout is null");
             return null;
@@ -152,7 +152,7 @@ public class DialogUtils extends DialogFragment {
     /**
      * Simple dialog message
      */
-    public static Dialog createDialogMessage(Activity activity, String title, String message,
+    public static Dialog createDialogMessage(Context activity, String title, String message,
                 String cancelButton, String doneButton, boolean cancelable, final DialogListener listener) {
         if (activity == null)
             return null;

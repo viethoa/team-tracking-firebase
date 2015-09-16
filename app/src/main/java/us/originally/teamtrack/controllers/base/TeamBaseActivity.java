@@ -51,9 +51,9 @@ public abstract class TeamBaseActivity extends MapBaseActivity implements
     public void onPause() {
         if (!AppUtils.getAppState()) {
             logDebug("app stopped by home button");
-            if (mUser != null) {
+            if (mUser != null && mTeam != null) {
                 mUser.state = false;
-                onChangeUserInfoOrState(mUser);
+                onChangeUserInfoOrState(this, mTeam, mUser);
             }
         }
         super.onPause();
@@ -183,22 +183,22 @@ public abstract class TeamBaseActivity extends MapBaseActivity implements
         onUserInfoChanged(user);
     }
 
-    protected void onChangeUserInfoOrState(UserTeamModel user) {
-        if (user == null || mTeam == null || StringUtils.isNull(mTeam.team_name))
+    public static void onChangeUserInfoOrState(Context context, TeamModel team, UserTeamModel user) {
+        if (user == null || team == null || StringUtils.isNull(team.team_name))
             return;
 
-        Firebase ref = FireBaseAction.getFirebaseRef(this);
+        Firebase ref = FireBaseAction.getFirebaseRef(context);
         if (ref == null)
             return;
 
-        ref.child(Constant.TEAM_GROUP).child(mTeam.team_name).child(Constant.SLUG_USERS)
+        ref.child(Constant.TEAM_GROUP).child(team.team_name).child(Constant.SLUG_USERS)
                 .child(user.device_uuid).setValue(user, new Firebase.CompletionListener() {
             @Override
             public void onComplete(FirebaseError firebaseError, Firebase firebase) {
                 if (firebaseError != null) {
-                    logDebug("FireBase User could not be saved. " + firebaseError.getMessage());
+                    Log.d("UpdateUserInfo", "FireBase User could not be saved. " + firebaseError.getMessage());
                 } else {
-                    logDebug("FireBase User saved successfully.");
+                    Log.d("UpdateUserInfo", "FireBase User saved successfully.");
                 }
             }
         });
