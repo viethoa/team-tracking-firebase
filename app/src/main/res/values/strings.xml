@@ -18,4 +18,8 @@
     <string name="str_login_valid_name">Please enter your name !</string>
     <string name="str_login_valid_team">Please enter your team name !</string>
     <string name="str_login_valid_password">What is your password?</string>
+    <string name="str_logout_request">Logout Request</string>
+    <string name="str_logout_question">Do you want to logout?</string>
+    <string name="dialog_cancel">Cancel</string>
+    <string name="dialog_ok">Ok</string>
 </resources>

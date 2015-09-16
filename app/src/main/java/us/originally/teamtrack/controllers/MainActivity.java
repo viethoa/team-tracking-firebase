@@ -1,5 +1,6 @@
 package us.originally.teamtrack.controllers;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 
 import com.lorem_ipsum.utils.DeviceUtils;
 import com.lorem_ipsum.utils.StringUtils;
+import com.viethoa.DialogUtils;
 
 import java.io.IOException;
 
@@ -90,7 +92,7 @@ public class MainActivity extends TeamBaseActivity implements
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        requestLogOut();
     }
 
     //----------------------------------------------------------------------------------------------
@@ -201,8 +203,32 @@ public class MainActivity extends TeamBaseActivity implements
         mUser.lng = lng;
     }
 
-    protected void logout() {
+    protected void requestLogOut() {
+        String title = getString(R.string.str_logout_request);
+        String message = getString(R.string.str_logout_question);
+        String negativeButton = getString(R.string.dialog_cancel);
+        String positiveButton = getString(R.string.dialog_ok);
+        final Dialog gpsSettingDialog = DialogUtils.createDialogMessage(this, title,
+                message, negativeButton, positiveButton, false, new DialogUtils.DialogListener() {
+                    @Override
+                    public void onPositiveButton() {
+                        performLogout();
+                        finish();
+                    }
 
+                    @Override
+                    public void onNegativeButton() {
+
+                    }
+                });
+
+        if (gpsSettingDialog != null && !gpsSettingDialog.isShowing()) {
+            gpsSettingDialog.show();
+        }
+    }
+
+    protected void performLogout() {
+        reemoveUserFromTeam(mUser);
     }
 
     protected boolean validUser(UserTeamModel user) {

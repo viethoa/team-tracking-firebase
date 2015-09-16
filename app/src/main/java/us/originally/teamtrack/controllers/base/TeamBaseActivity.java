@@ -185,6 +185,28 @@ public abstract class TeamBaseActivity extends MapBaseActivity implements
         });
     }
 
+    protected void reemoveUserFromTeam(UserTeamModel user) {
+        if (user == null || StringUtils.isNull(user.device_uuid))
+            return;
+        if (mTeam == null || StringUtils.isNull(mTeam.team_name))
+            return;
+        Firebase ref = FireBaseAction.getFirebaseRef(this);
+        if (ref == null)
+            return;
+
+        ref.child(Constant.TEAM_GROUP).child(mTeam.team_name).child(Constant.SLUG_USERS).child(user.device_uuid)
+                .removeValue(new Firebase.CompletionListener() {
+                    @Override
+                    public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                        if (firebaseError != null) {
+                            Log.d("RemoveUser", "FireBase User could not be saved. " + firebaseError.getMessage());
+                        } else {
+                            Log.d("RemoveUser", "FireBase User saved successfully.");
+                        }
+                    }
+                });
+    }
+
     public class UsersEventListener implements ChildEventListener {
 
         @Override
