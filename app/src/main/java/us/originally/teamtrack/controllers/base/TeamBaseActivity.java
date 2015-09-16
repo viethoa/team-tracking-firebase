@@ -16,7 +16,7 @@ import us.originally.teamtrack.customviews.VisualizerView;
 import us.originally.teamtrack.models.Comment;
 import us.originally.teamtrack.models.TeamModel;
 import us.originally.teamtrack.models.UserTeamModel;
-import us.originally.teamtrack.modules.chat.audio.AudioModel;
+import us.originally.teamtrack.models.AudioModel;
 import us.originally.teamtrack.modules.chat.audio.AudioStreamManager;
 import us.originally.teamtrack.modules.firebase.FireBaseAction;
 
@@ -93,7 +93,7 @@ public abstract class TeamBaseActivity extends MapBaseActivity implements
 
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-            logDebug("message: " + dataSnapshot.getValue());
+            logDebug("User message: " + dataSnapshot.getValue());
             onMessagePushed(dataSnapshot);
         }
 
@@ -313,7 +313,7 @@ public abstract class TeamBaseActivity extends MapBaseActivity implements
 
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-            logDebug("user add: " + dataSnapshot.getValue());
+            logDebug("user taking: " + dataSnapshot.getValue());
             onReceiveAudio(dataSnapshot);
         }
 

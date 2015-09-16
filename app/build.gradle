@@ -20,6 +20,7 @@ android {
         }
     }
     packagingOptions {
+        exclude 'META-INF/services/javax.annotation.processing.Processor'
         exclude 'META-INF/DEPENDENCIES.txt'
         exclude 'META-INF/DEPENDENCIES'
         exclude 'META-INF/dependencies.txt'

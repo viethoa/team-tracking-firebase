@@ -1,8 +1,6 @@
-package us.originally.teamtrack.modules.chat.audio;
+package us.originally.teamtrack.models;
 
 import java.io.Serializable;
-
-import us.originally.teamtrack.models.UserTeamModel;
 
 /**
  * Created by VietHoa on 04/09/15.

@@ -310,17 +310,6 @@ public class MainActivity extends TeamBaseActivity implements
         if (comment.user != null && StringUtils.isNotNull(comment.message))
             tvUserComment.setText(comment.message);
 
-        //Take sound
-        try {
-            AssetFileDescriptor afd = getAssets().openFd("sounds/comment_notify_sound.mp3");
-            MediaPlayer player = new MediaPlayer();
-            player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
-            player.prepare();
-            player.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         //Take notify box
         final float screenWidth = DeviceUtils.getDeviceScreenWidth(this);
         mNotifyCommentBox.animate().translationX(0f).start();
@@ -334,6 +323,17 @@ public class MainActivity extends TeamBaseActivity implements
                 mNotifyCommentBox.animate().alpha(0f).start();
             }
         }, NOTIFY_COMMENT_DELAY);
+
+        //Take sound
+        try {
+            AssetFileDescriptor afd = getAssets().openFd("sounds/comment_notify_sound.mp3");
+            MediaPlayer player = new MediaPlayer();
+            player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+            player.prepare();
+            player.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     //----------------------------------------------------------------------------------------------

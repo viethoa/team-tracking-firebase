@@ -18,7 +18,7 @@ import us.originally.teamtrack.R;
 import us.originally.teamtrack.adapters.ChattingAdapter;
 import us.originally.teamtrack.customviews.VisualizerView;
 import us.originally.teamtrack.modules.chat.MessageModel;
-import us.originally.teamtrack.modules.chat.audio.AudioModel;
+import us.originally.teamtrack.models.AudioModel;
 import us.originally.teamtrack.modules.chat.audio.AudioRecordManager;
 
 public class AudioMessageActivity extends BaseActivity implements VisualizerView.VisualizerListener {

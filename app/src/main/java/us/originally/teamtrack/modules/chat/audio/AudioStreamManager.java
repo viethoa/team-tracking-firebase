@@ -11,6 +11,7 @@ import android.util.Log;
 import de.greenrobot.event.EventBus;
 import us.originally.teamtrack.EventBus.VisualizeEvent;
 import us.originally.teamtrack.controllers.base.TeamBaseActivity;
+import us.originally.teamtrack.models.AudioModel;
 import us.originally.teamtrack.models.TeamModel;
 import us.originally.teamtrack.models.UserTeamModel;
 

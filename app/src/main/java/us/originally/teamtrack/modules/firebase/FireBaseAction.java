@@ -15,7 +15,7 @@ import de.greenrobot.event.EventBus;
 import us.originally.teamtrack.EventBus.MessageEvent;
 import us.originally.teamtrack.R;
 import us.originally.teamtrack.modules.chat.MessageModel;
-import us.originally.teamtrack.modules.chat.audio.AudioModel;
+import us.originally.teamtrack.models.AudioModel;
 
 
 /**

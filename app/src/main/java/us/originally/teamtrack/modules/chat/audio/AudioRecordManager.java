@@ -13,6 +13,7 @@ import java.util.List;
 
 import de.greenrobot.event.EventBus;
 import us.originally.teamtrack.EventBus.VisualizeEvent;
+import us.originally.teamtrack.models.AudioModel;
 
 /**
  * Created by VietHoa on 03/09/15.

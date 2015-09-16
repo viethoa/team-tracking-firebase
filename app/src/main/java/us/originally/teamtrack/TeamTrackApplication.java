@@ -5,16 +5,22 @@ import com.lorem_ipsum.utils.DeviceUtils;
 import com.parse.Parse;
 import com.parse.ParseInstallation;
 
+import dagger.ObjectGraph;
+import us.originally.teamtrack.modules.dagger.AppModule;
+
 /**
  * Created by VietHoa on 04/09/15.
  */
 public class TeamTrackApplication extends AppUtils {
+
+    protected ObjectGraph objectGraph;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
         initialiseParse();
+        initialiseGraph();
     }
 
     protected void initialiseParse() {
@@ -29,4 +35,18 @@ public class TeamTrackApplication extends AppUtils {
             e.printStackTrace();
         }
     }
+
+    protected void initialiseGraph() {
+        objectGraph = ObjectGraph.create(new AppModule(this));
+    }
+
+    public ObjectGraph extendScope(Object... modules) {
+        if (modules != null) {
+            return objectGraph.plus(modules);
+        } else {
+            return objectGraph;
+        }
+    }
+
+
 }

@@ -3,7 +3,7 @@ package us.originally.teamtrack.modules.chat;
 import java.io.Serializable;
 import java.util.List;
 
-import us.originally.teamtrack.modules.chat.audio.AudioModel;
+import us.originally.teamtrack.models.AudioModel;
 
 /**
  * Created by VietHoa on 04/09/15.
