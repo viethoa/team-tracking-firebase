@@ -17,7 +17,7 @@ import us.originally.teamtrack.models.UserTeamModel;
 /**
  * Created by VietHoa on 16/09/15.
  */
-public class TrackingLocationService extends Service {
+public class LocationTrackingService extends Service {
 
     private static final String TAG = "TrackingLocationService";
     private static final int TRACKING_TIME = 5000;

@@ -27,7 +27,7 @@ import us.originally.teamtrack.models.Comment;
 import us.originally.teamtrack.models.TeamModel;
 import us.originally.teamtrack.models.UserTeamModel;
 import us.originally.teamtrack.modules.chat.audio.AudioStreamManager;
-import us.originally.teamtrack.services.TrackingLocationService;
+import us.originally.teamtrack.services.LocationTrackingService;
 
 public class MainActivity extends TeamBaseActivity implements
         GPSTrackerManager.GPSListener, ChattingView.ChattingViewListener {
@@ -133,7 +133,7 @@ public class MainActivity extends TeamBaseActivity implements
         }
 
         //Start tracking location service
-        Intent intent = new Intent(this, TrackingLocationService.class);
+        Intent intent = new Intent(this, LocationTrackingService.class);
         intent.putExtra(EXTRACT_TEAM, mTeam);
         intent.putExtra(EXTRACT_USER, mUser);
         startService(intent);
