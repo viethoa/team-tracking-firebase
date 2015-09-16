@@ -3,19 +3,11 @@
     <color name="app_primary_color">#F44336</color>
     <color name="app_primary_color_dark">#c31c13</color>
 
-    <color name="app_transparent_color">#00ffffff</color>
+    <color name="transparent">#00000000</color>
     <color name="app_green_color">#43A047</color>
     <color name="app_orange_color">#ffef9c01</color>
 
-    <color name="dialog_bg_content">@color/text_color_light</color>
-    <color name="dialog_bg_color">#fffbfbfb</color>
-
-    <color name="text_color_hint">#ffb7b7b7</color>
-    <color name="text_color_black">#FF333333</color>
-    <color name="text_color_dark">#FF555555</color>
-    <color name="text_color_gray">#FF777777</color>
-    <color name="text_color_light">#FF999999</color>
-    <color name="text_color_bright">#FFFFFFFF</color>
-
+    <color name="dialog_bg_color">#FFFFFFFF</color>
+    <color name="dialog_bg_border">#BDBDBD</color>
 
 </resources>

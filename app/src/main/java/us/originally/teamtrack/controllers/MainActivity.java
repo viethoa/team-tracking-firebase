@@ -89,20 +89,7 @@ public class MainActivity extends TeamBaseActivity implements
     }
 
     @Override
-    public void onResume() {
-        if (mUser != null && mTeam != null) {
-            mUser.state = true;
-            onChangeUserInfoOrState(this, mTeam, mUser);
-        }
-        super.onResume();
-    }
-
-    @Override
     public void onBackPressed() {
-        if (mUser != null && mTeam != null) {
-            mUser.state = false;
-            onChangeUserInfoOrState(this, mTeam, mUser);
-        }
         super.onBackPressed();
     }
 
@@ -212,7 +199,10 @@ public class MainActivity extends TeamBaseActivity implements
 
         mUser.lat = lat;
         mUser.lng = lng;
-        onChangeUserInfoOrState(this, mTeam, mUser);
+    }
+
+    protected void logout() {
+
     }
 
     protected boolean validUser(UserTeamModel user) {
@@ -242,7 +232,7 @@ public class MainActivity extends TeamBaseActivity implements
         if (user == null || validUser(user))
             return;
 
-        changeUserLocationOrState(user);
+        changeUserLocation(user);
     }
 
     //----------------------------------------------------------------------------------------------

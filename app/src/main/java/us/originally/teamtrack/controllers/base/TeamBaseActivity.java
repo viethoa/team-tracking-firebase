@@ -1,7 +1,6 @@
 package us.originally.teamtrack.controllers.base;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -39,24 +38,6 @@ public abstract class TeamBaseActivity extends MapBaseActivity implements
         initialiseTeamUser();
         initialiseTeamMessage();
         initialiseAudio();
-    }
-
-    @Override
-    public void startActivity(Intent intent) {
-        AppUtils.setAppState(true);
-        super.startActivity(intent);
-    }
-
-    @Override
-    public void onPause() {
-        if (!AppUtils.getAppState()) {
-            logDebug("app stopped by home button");
-            if (mUser != null && mTeam != null) {
-                mUser.state = false;
-                onChangeUserInfoOrState(this, mTeam, mUser);
-            }
-        }
-        super.onPause();
     }
 
     /**
@@ -183,7 +164,7 @@ public abstract class TeamBaseActivity extends MapBaseActivity implements
         onUserInfoChanged(user);
     }
 
-    public static void onChangeUserInfoOrState(Context context, TeamModel team, UserTeamModel user) {
+    public static void onUpdateUserInfo(Context context, TeamModel team, UserTeamModel user) {
         if (user == null || team == null || StringUtils.isNull(team.team_name))
             return;
 

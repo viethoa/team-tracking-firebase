@@ -73,12 +73,9 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         String user = "";
         String userUuid = "";
         String timeStamp = "";
-        boolean isOnl = true;
 
         if (comment != null) {
             message = comment.message;
-            isOnl = comment.user.state;
-
             timeStamp = convertToDateTime(comment.time_stamp);
             if (comment.user != null) {
                 user = comment.user.name;
@@ -95,7 +92,6 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         viewHolder.vSpaceLeft.setVisibility(isMyComment ? View.VISIBLE : View.GONE);
         viewHolder.vSpaceRight.setVisibility(isMyComment ? View.GONE : View.VISIBLE);
         viewHolder.tvUserName.setText(isMyComment ? "me" : user);
-        //viewHolder.ivIconUser.setImageResource(isOnl ? R.mipmap.ic_user_onl : R.mipmap.ic_user_off);
     }
 
     @Override

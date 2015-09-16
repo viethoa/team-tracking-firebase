@@ -81,7 +81,7 @@ public class LocationTrackingService extends Service {
         if (latDistance >= 0.001 || lonDistance >= 0.001) {
             latitude = newLat;
             longitude = newLon;
-            TeamBaseActivity.onChangeUserInfoOrState(mContext, mTeam, mUser);
+            TeamBaseActivity.onUpdateUserInfo(mContext, mTeam, mUser);
         }
     }
 }

@@ -109,10 +109,7 @@ public abstract class MapBaseActivity extends BaseActivity {
         userOnMap.marker = map.addMarker(new MarkerOptions()
                         .position(latLng)
                         .title(user.name)
-                        .icon( user.state
-                                   ? BitmapDescriptorFactory.fromResource(R.mipmap.user_location_onl)
-                                   : BitmapDescriptorFactory.fromResource(R.mipmap.user_location_off)
-                        )
+                        .icon(BitmapDescriptorFactory.fromResource(R.mipmap.user_location_onl))
         );
 
         //Show marker title always
@@ -124,7 +121,7 @@ public abstract class MapBaseActivity extends BaseActivity {
         mUsersOnMap.add(userOnMap);
     }
 
-    protected void changeUserLocationOrState(UserTeamModel user) {
+    protected void changeUserLocation(UserTeamModel user) {
         if (user == null || StringUtils.isNull(user.device_uuid))
             return;
 
@@ -143,12 +140,6 @@ public abstract class MapBaseActivity extends BaseActivity {
         }
         if (userChanged == null)
             return;
-
-        //Change user status
-        userChanged.marker.setIcon(
-                user.state ? BitmapDescriptorFactory.fromResource(R.mipmap.user_location_onl)
-                        : BitmapDescriptorFactory.fromResource(R.mipmap.user_location_off)
-        );
 
         //Change location
         userChanged.marker.setPosition(new LatLng(user.lat, user.lng));
