@@ -106,7 +106,7 @@ public class AudioMessageActivity extends BaseActivity implements VisualizerView
     }
 
     @Override
-    public void onEntered() {
+    public void onSpeaking() {
         if (AudioRecordManager.isRecording())
             return;
 
@@ -119,7 +119,7 @@ public class AudioMessageActivity extends BaseActivity implements VisualizerView
     }
 
     @Override
-    public void onLeaved() {
+    public void onSpeakStopped() {
         ArrayList<AudioModel> audio = AudioRecordManager.stopRecording();
         if (audio == null || audio.size() <= 0) {
             logError("Record error problem");

@@ -355,7 +355,7 @@ public class MainActivity extends TeamBaseActivity implements
     }
 
     @Override
-    public void onEntered() {
+    public void onSpeaking() {
         if (AudioStreamManager.isRecording() || mTeam == null || mUser == null)
             return;
 
@@ -368,7 +368,7 @@ public class MainActivity extends TeamBaseActivity implements
     }
 
     @Override
-    public void onLeaved() {
+    public void onSpeakStopped() {
         AudioStreamManager.stopRecording();
     }
 }

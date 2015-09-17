@@ -67,8 +67,8 @@ public class VisualizerView extends RelativeLayout {
     }
 
     public interface VisualizerListener {
-        void onEntered();
-        void onLeaved();
+        void onSpeaking();
+        void onSpeakStopped();
     }
 
     //----------------------------------------------------------------------------------------------
@@ -155,7 +155,7 @@ public class VisualizerView extends RelativeLayout {
 
         protected void onTouchEntered() {
             if (listener != null) {
-                listener.onEntered();
+                listener.onSpeaking();
             }
 
             Resources res = getContext().getResources();
@@ -168,7 +168,7 @@ public class VisualizerView extends RelativeLayout {
 
         protected void onTouchLeaved() {
             if (listener != null) {
-                listener.onLeaved();
+                listener.onSpeakStopped();
             }
 
             isStopRecording = true;

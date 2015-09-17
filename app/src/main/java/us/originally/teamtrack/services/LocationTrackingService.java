@@ -2,6 +2,7 @@ package us.originally.teamtrack.services;
 
 import android.app.Service;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
@@ -24,6 +25,7 @@ public class LocationTrackingService extends Service {
 
     private static final String TAG = "TrackingLocationService";
     private static final int TRACKING_TIME = 5000;
+    private static final int DISTANCE_TRACKING = 1;
 
     private static double latitude = 0;
     private static double longitude = 0;
@@ -81,12 +83,13 @@ public class LocationTrackingService extends Service {
 
         double newLat = mGpsTracker.getLatitude();
         double newLon = mGpsTracker.getLongitude();
-        double latDistance = newLat - latitude;
-        double lonDistance = newLon - longitude;
-        Log.d(TAG, String.valueOf(newLat));
-        Log.d(TAG, String.valueOf(newLon));
+        float[] results = new float[1];
+        Location.distanceBetween(latitude, longitude, newLat, newLon, results);
 
-        if (latDistance >= 0.001 || lonDistance >= 0.001) {
+        if (results[0] > DISTANCE_TRACKING) {
+            Log.d(TAG, String.valueOf(newLat));
+            Log.d(TAG, String.valueOf(newLon));
+
             latitude = newLat;
             longitude = newLon;
             userManager.updateUser(mTeam, mUser);

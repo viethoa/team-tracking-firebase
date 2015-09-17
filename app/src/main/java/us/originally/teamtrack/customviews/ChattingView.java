@@ -27,6 +27,8 @@ import us.originally.teamtrack.models.Comment;
  */
 public class ChattingView extends RelativeLayout {
 
+    private static final int LIMIT_TIME_TO_JOIN_COMMENT = 5;
+
     protected ChattingViewListener listener;
     protected ArrayList<Comment> mDataArray;
     protected CommentAdapter mAdapter;
@@ -130,7 +132,8 @@ public class ChattingView extends RelativeLayout {
             return;
         }
 
-        if (comment.user.device_uuid.equals(lastComment.user.device_uuid)) {
+        long minute = Math.abs((lastComment.time_stamp - comment.time_stamp) / (1000 * 60)) % 60;
+        if (comment.user.device_uuid.equals(lastComment.user.device_uuid) && minute <= LIMIT_TIME_TO_JOIN_COMMENT) {
             lastComment.message += "\n\n" + comment.message;
             Collections.sort(mDataArray);
             return;
