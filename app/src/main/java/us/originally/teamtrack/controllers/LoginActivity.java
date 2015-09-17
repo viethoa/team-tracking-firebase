@@ -149,29 +149,7 @@ public class LoginActivity extends BaseGraphActivity {
         final TeamModel teamModel = new TeamModel(teamName, password, timeStamp);
 
         showLoadingDialog();
-        //takeLoginOrSubscribe(teamModel, user);
-        userManager.loginOrSubscribe(teamModel, user, new CallbackListener<UserTeamModel>() {
-            @Override
-            public void onDone(UserTeamModel response, Exception exception) {
-                dismissLoadingDialog();
-                if (exception != null) {
-                    showToastErrorMessage(exception.getMessage());
-                    return;
-                }
-
-                goToNextScreen(teamModel, user);
-            }
-        });
-    }
-
-    //@Override
-    protected void goToNextScreen(TeamModel teamModel, UserTeamModel user) {
-        if (teamModel == null || user == null)
-            return;
-
-        CacheManager.saveStringCacheData(CACHE_TEAM_KEY, teamModel.team_name);
-        CacheManager.saveStringCacheData(CACHE_USER_NAME_KEY, user.name);
-        startActivity(MainActivity.getInstance(this, teamModel, user));
+        userManager.loginOrSubscribe(teamModel, user, new LoginOrSubscribeCallback(teamModel, user));
     }
 
     protected String takePasswordMd5(String password) {
@@ -219,5 +197,40 @@ public class LoginActivity extends BaseGraphActivity {
         }
 
         return true;
+    }
+
+    //----------------------------------------------------------------------------------------------
+    //  Api helper
+    //----------------------------------------------------------------------------------------------
+
+    protected class LoginOrSubscribeCallback implements CallbackListener<UserTeamModel> {
+
+        private TeamModel teamModel;
+        private UserTeamModel user;
+
+        public LoginOrSubscribeCallback(TeamModel teamModel, UserTeamModel user) {
+            this.teamModel = teamModel;
+            this.user = user;
+        }
+
+        @Override
+        public void onDone(UserTeamModel response, Exception exception) {
+            dismissLoadingDialog();
+            if (exception != null) {
+                showToastErrorMessage(exception.getMessage());
+                return;
+            }
+
+            goToNextScreen(teamModel, user);
+        }
+    }
+
+    protected void goToNextScreen(TeamModel teamModel, UserTeamModel user) {
+        if (teamModel == null || user == null)
+            return;
+
+        CacheManager.saveStringCacheData(CACHE_TEAM_KEY, teamModel.team_name);
+        CacheManager.saveStringCacheData(CACHE_USER_NAME_KEY, user.name);
+        startActivity(MainActivity.getInstance(this, teamModel, user));
     }
 }
