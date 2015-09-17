@@ -16,6 +16,8 @@ import com.viethoa.DialogUtils;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
+
 import butterknife.InjectView;
 import butterknife.OnClick;
 import de.greenrobot.event.EventBus;
@@ -29,6 +31,7 @@ import us.originally.teamtrack.models.Comment;
 import us.originally.teamtrack.models.TeamModel;
 import us.originally.teamtrack.models.UserTeamModel;
 import us.originally.teamtrack.modules.chat.audio.AudioStreamManager;
+import us.originally.teamtrack.modules.dagger.managers.UserManager;
 import us.originally.teamtrack.services.LocationTrackingService;
 
 public class MainActivity extends TeamBaseActivity implements
@@ -57,6 +60,9 @@ public class MainActivity extends TeamBaseActivity implements
     TextView tvUserComment;
     @InjectView(R.id.ll_footer)
     View mFooter;
+
+    @Inject
+    UserManager userManager;
 
     public static Intent getInstance(Context context, TeamModel teamModel, UserTeamModel user) {
         Intent intent = new Intent(context, MainActivity.class);
@@ -228,7 +234,7 @@ public class MainActivity extends TeamBaseActivity implements
     }
 
     protected void performLogout() {
-        removeUserFromTeam(mUser);
+         userManager.logout(mTeam, mUser);
     }
 
     protected boolean validUser(UserTeamModel user) {
@@ -297,7 +303,7 @@ public class MainActivity extends TeamBaseActivity implements
         CommentId += 1;
         long timeStamp = System.currentTimeMillis();
         Comment userComment = new Comment(CommentId, timeStamp, comment, mUser);
-        pushComment(userComment);
+        userManager.pushComment(userComment, mTeam);
     }
 
     protected void takeNotifyComment(Comment comment) {
@@ -329,8 +335,8 @@ public class MainActivity extends TeamBaseActivity implements
             AssetFileDescriptor afd = getAssets().openFd("sounds/comment_notify_sound.mp3");
             MediaPlayer player = new MediaPlayer();
             player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
-            player.prepare();
-            player.start();
+            //player.prepare();
+            //player.start();
         } catch (IOException e) {
             e.printStackTrace();
         }

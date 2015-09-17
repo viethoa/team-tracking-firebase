@@ -1,8 +1,6 @@
 package us.originally.teamtrack.controllers.base;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
@@ -11,14 +9,16 @@ import com.firebase.client.FirebaseError;
 import com.lorem_ipsum.utils.AppUtils;
 import com.lorem_ipsum.utils.StringUtils;
 
+import javax.inject.Inject;
+
 import us.originally.teamtrack.Constant;
 import us.originally.teamtrack.customviews.VisualizerView;
+import us.originally.teamtrack.managers.FireBaseManager;
+import us.originally.teamtrack.models.AudioModel;
 import us.originally.teamtrack.models.Comment;
 import us.originally.teamtrack.models.TeamModel;
 import us.originally.teamtrack.models.UserTeamModel;
-import us.originally.teamtrack.models.AudioModel;
 import us.originally.teamtrack.modules.chat.audio.AudioStreamManager;
-import us.originally.teamtrack.modules.firebase.FireBaseAction;
 
 /**
  * Created by VietHoa on 14/09/15.
@@ -28,6 +28,9 @@ public abstract class TeamBaseActivity extends MapBaseActivity implements
 
     protected UserTeamModel mUser;
     protected TeamModel mTeam;
+    
+    @Inject
+    FireBaseManager fireBaseManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,25 +58,12 @@ public abstract class TeamBaseActivity extends MapBaseActivity implements
         if (mTeam == null || StringUtils.isNull(mTeam.team_name))
             return;
 
-        Firebase ref = FireBaseAction.getFirebaseRef(this);
+        Firebase ref = fireBaseManager.getFireBaseRef();
         if (ref == null)
             return;
 
         ref.child(Constant.TEAM_GROUP).child(mTeam.team_name).child(Constant.SLUG_MESSAGE)
                 .addChildEventListener(new MessagesEventListener());
-    }
-
-    protected void pushComment(Comment comment) {
-        if (comment == null || mTeam == null || StringUtils.isNull(mTeam.team_name))
-            return;
-
-        Firebase ref = FireBaseAction.getFirebaseRef(this);
-        if (ref == null)
-            return;
-
-        String commentId = comment.time_stamp + "_" + comment.user.device_uuid;
-        ref.child(Constant.TEAM_GROUP).child(mTeam.team_name).child(Constant.SLUG_MESSAGE)
-                .child(commentId).setValue(comment);
     }
 
     protected void onMessagePushed(DataSnapshot dataSnapshot) {
@@ -130,7 +120,7 @@ public abstract class TeamBaseActivity extends MapBaseActivity implements
         if (mTeam == null || StringUtils.isNull(mTeam.team_name))
             return;
 
-        Firebase ref = FireBaseAction.getFirebaseRef(this);
+        Firebase ref = fireBaseManager.getFireBaseRef();
         if (ref == null)
             return;
 
@@ -177,49 +167,6 @@ public abstract class TeamBaseActivity extends MapBaseActivity implements
         onUserMoveOut(user);
     }
 
-    public static void onUpdateUserInfo(Context context, TeamModel team, UserTeamModel user) {
-        if (user == null || team == null || StringUtils.isNull(team.team_name))
-            return;
-
-        Firebase ref = FireBaseAction.getFirebaseRef(context);
-        if (ref == null)
-            return;
-
-        ref.child(Constant.TEAM_GROUP).child(team.team_name).child(Constant.SLUG_USERS)
-                .child(user.device_uuid).setValue(user, new Firebase.CompletionListener() {
-            @Override
-            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-                if (firebaseError != null) {
-                    Log.d("UpdateUserInfo", "FireBase User could not be saved. " + firebaseError.getMessage());
-                } else {
-                    Log.d("UpdateUserInfo", "FireBase User saved successfully.");
-                }
-            }
-        });
-    }
-
-    protected void removeUserFromTeam(UserTeamModel user) {
-        if (user == null || StringUtils.isNull(user.device_uuid))
-            return;
-        if (mTeam == null || StringUtils.isNull(mTeam.team_name))
-            return;
-        Firebase ref = FireBaseAction.getFirebaseRef(this);
-        if (ref == null)
-            return;
-
-        ref.child(Constant.TEAM_GROUP).child(mTeam.team_name).child(Constant.SLUG_USERS).child(user.device_uuid)
-                .removeValue(new Firebase.CompletionListener() {
-                    @Override
-                    public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-                        if (firebaseError != null) {
-                            Log.d("RemoveUser", "FireBase User could not be saved. " + firebaseError.getMessage());
-                        } else {
-                            Log.d("RemoveUser", "FireBase User saved successfully.");
-                        }
-                    }
-                });
-    }
-
     public class UsersEventListener implements ChildEventListener {
 
         @Override
@@ -259,34 +206,12 @@ public abstract class TeamBaseActivity extends MapBaseActivity implements
         if (mTeam == null || StringUtils.isNull(mTeam.team_name))
             return;
 
-        Firebase ref = FireBaseAction.getFirebaseRef(this);
+        Firebase ref = fireBaseManager.getFireBaseRef();
         if (ref == null)
             return;
 
         ref.child(Constant.TEAM_GROUP).child(mTeam.team_name).child(Constant.SLUG_AUDIOS)
                 .addChildEventListener(new AudioEventListener());
-    }
-
-    public static void pushAudio(Context context, AudioModel audioModel, TeamModel mTeam) {
-        if (!isAudioValid(audioModel) || mTeam == null || StringUtils.isNull(mTeam.team_name))
-            return;
-
-        Firebase ref = FireBaseAction.getFirebaseRef(context);
-        if (ref == null)
-            return;
-
-        String audioId = "audio_" + audioModel.timestamp;
-        ref.child(Constant.TEAM_GROUP).child(mTeam.team_name).child(Constant.SLUG_AUDIOS)
-                .child(audioId).setValue(audioModel, new Firebase.CompletionListener() {
-            @Override
-            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-                if (firebaseError != null) {
-                    Log.d("StreamAudio", "FireBase audio could not be saved. " + firebaseError.getMessage());
-                } else {
-                    Log.d("StreamAudio", "FireBase audio saved successfully.");
-                }
-            }
-        });
     }
 
     protected boolean onReceiveAudio(DataSnapshot dataSnapshot) {
@@ -336,9 +261,5 @@ public abstract class TeamBaseActivity extends MapBaseActivity implements
         public void onCancelled(FirebaseError firebaseError) {
 
         }
-    }
-
-    protected static boolean isAudioValid(AudioModel audio) {
-        return (audio != null && audio.size != null && audio.size > 0 && StringUtils.isNotNull(audio.encode));
     }
 }

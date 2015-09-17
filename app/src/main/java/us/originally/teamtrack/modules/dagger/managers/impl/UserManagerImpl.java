@@ -11,11 +11,13 @@ import com.lorem_ipsum.utils.DeviceUtils;
 import com.lorem_ipsum.utils.StringUtils;
 
 import us.originally.teamtrack.Constant;
+import us.originally.teamtrack.managers.FireBaseManager;
+import us.originally.teamtrack.models.AudioModel;
+import us.originally.teamtrack.models.Comment;
 import us.originally.teamtrack.models.TeamModel;
 import us.originally.teamtrack.models.UserTeamModel;
 import us.originally.teamtrack.modules.dagger.callback.CallbackListener;
 import us.originally.teamtrack.modules.dagger.managers.UserManager;
-import us.originally.teamtrack.modules.firebase.FireBaseAction;
 
 /**
  * Created by VietHoa on 16/09/15.
@@ -23,10 +25,12 @@ import us.originally.teamtrack.modules.firebase.FireBaseAction;
 public class UserManagerImpl implements UserManager {
 
     private static final String TAG = "UserManager";
+    private FireBaseManager fireBaseManager;
     private Context mContext;
 
-    public UserManagerImpl(Context context) {
+    public UserManagerImpl(Context context, FireBaseManager fireBaseManager) {
         this.mContext = context;
+        this.fireBaseManager = fireBaseManager;
     }
 
     @Override
@@ -38,7 +42,7 @@ public class UserManagerImpl implements UserManager {
             return;
         }
 
-        Firebase ref = FireBaseAction.getFirebaseRef(mContext);
+        Firebase ref = fireBaseManager.getFireBaseRef();
         if (ref == null) {
             if (callback != null) {
                 callback.onDone(null, new IllegalAccessException("FireBase syntax error"));
@@ -52,7 +56,95 @@ public class UserManagerImpl implements UserManager {
 
     @Override
     public void logout(TeamModel team, UserTeamModel user) {
+        if (user == null || StringUtils.isNull(user.device_uuid))
+            return;
 
+        if (team == null || StringUtils.isNull(team.team_name))
+            return;
+
+        Firebase ref = fireBaseManager.getFireBaseRef();
+        if (ref == null)
+            return;
+
+        ref.child(Constant.TEAM_GROUP).child(team.team_name).child(Constant.SLUG_USERS).child(user.device_uuid)
+                .removeValue(new Firebase.CompletionListener() {
+                    @Override
+                    public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                        if (firebaseError != null) {
+                            Log.d(TAG, "Logout error: " + firebaseError.getMessage());
+                        } else {
+                            Log.d(TAG, "Logout successfully.");
+                        }
+                    }
+                });
+    }
+
+    @Override
+    public void updateUser(TeamModel team, UserTeamModel user) {
+        if (user == null || team == null || StringUtils.isNull(team.team_name))
+            return;
+
+        Firebase ref = fireBaseManager.getFireBaseRef();
+        if (ref == null)
+            return;
+
+        ref.child(Constant.TEAM_GROUP).child(team.team_name).child(Constant.SLUG_USERS)
+                .child(user.device_uuid).setValue(user, new Firebase.CompletionListener() {
+            @Override
+            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                if (firebaseError != null) {
+                    Log.d(TAG, "Update user error: " + firebaseError.getMessage());
+                } else {
+                    Log.d(TAG, "Update user successfully.");
+                }
+            }
+        });
+    }
+
+    @Override
+    public void pushComment(Comment comment, TeamModel team) {
+        if (comment == null || team == null || StringUtils.isNull(team.team_name))
+            return;
+
+        Firebase ref = fireBaseManager.getFireBaseRef();
+        if (ref == null)
+            return;
+
+        String commentId = comment.time_stamp + "_" + comment.user.device_uuid;
+        ref.child(Constant.TEAM_GROUP).child(team.team_name).child(Constant.SLUG_MESSAGE)
+                .child(commentId).setValue(comment, new Firebase.CompletionListener() {
+            @Override
+            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                if (firebaseError != null) {
+                    Log.d(TAG, "Push comment error: " + firebaseError.getMessage());
+                } else {
+                    Log.d(TAG, "Push comment successfully.");
+                }
+            }
+        });
+    }
+
+    @Override
+    public void pushAudio(AudioModel audioModel, TeamModel mTeam) {
+        if (!isAudioValid(audioModel) || mTeam == null || StringUtils.isNull(mTeam.team_name))
+            return;
+
+        Firebase ref = fireBaseManager.getFireBaseRef();
+        if (ref == null)
+            return;
+
+        String audioId = "audio_" + audioModel.timestamp;
+        ref.child(Constant.TEAM_GROUP).child(mTeam.team_name).child(Constant.SLUG_AUDIOS)
+                .child(audioId).setValue(audioModel, new Firebase.CompletionListener() {
+            @Override
+            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                if (firebaseError != null) {
+                    Log.d(TAG, "Push Audio error: " + firebaseError.getMessage());
+                } else {
+                    Log.d(TAG, "Push Audio successfully.");
+                }
+            }
+        });
     }
 
     //----------------------------------------------------------------------------------------------
@@ -67,9 +159,9 @@ public class UserManagerImpl implements UserManager {
             @Override
             public void onComplete(FirebaseError firebaseError, Firebase firebase) {
                 if (firebaseError != null) {
-                    Log.d(TAG, "Team Could not be saved. " + firebaseError.getMessage());
+                    Log.d(TAG, "Create Team error: " + firebaseError.getMessage());
                 } else {
-                    Log.d(TAG, "Team saved successfully");
+                    Log.d(TAG, "Create Team successfully");
                 }
             }
         });
@@ -96,6 +188,10 @@ public class UserManagerImpl implements UserManager {
                         }
                     }
                 });
+    }
+
+    protected static boolean isAudioValid(AudioModel audio) {
+        return (audio != null && audio.size != null && audio.size > 0 && StringUtils.isNotNull(audio.encode));
     }
 
     //----------------------------------------------------------------------------------------------

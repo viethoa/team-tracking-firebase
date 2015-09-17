@@ -1,18 +1,21 @@
 package us.originally.teamtrack.services;
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
+import javax.inject.Inject;
+
+import dagger.ObjectGraph;
 import us.originally.teamtrack.TeamTrackApplication;
 import us.originally.teamtrack.controllers.MainActivity;
-import us.originally.teamtrack.controllers.base.TeamBaseActivity;
 import us.originally.teamtrack.managers.GPSTrackerManager;
 import us.originally.teamtrack.models.TeamModel;
 import us.originally.teamtrack.models.UserTeamModel;
+import us.originally.teamtrack.modules.dagger.RequestModule;
+import us.originally.teamtrack.modules.dagger.managers.UserManager;
 
 /**
  * Created by VietHoa on 16/09/15.
@@ -26,13 +29,18 @@ public class LocationTrackingService extends Service {
     private static double longitude = 0;
     private static TeamModel mTeam = null;
     private static UserTeamModel mUser = null;
-
-    private static Context mContext;
     private static GPSTrackerManager mGpsTracker;
+
+    @Inject
+    UserManager userManager;
 
     @Override
     public void onCreate() {
-        mContext = TeamTrackApplication.getAppContext();
+        TeamTrackApplication application = (TeamTrackApplication) getApplication();
+        if (application != null) {
+            ObjectGraph graph = application.extendScope(new RequestModule());
+            graph.inject(this);
+        }
     }
 
     @Override
@@ -67,7 +75,7 @@ public class LocationTrackingService extends Service {
 
         Log.d(TAG, "Location service tracker");
         if (mGpsTracker == null)
-            mGpsTracker = new GPSTrackerManager(mContext);
+            mGpsTracker = new GPSTrackerManager(getApplicationContext());
         if (!mGpsTracker.canGetLocation())
             return;
 
@@ -81,7 +89,7 @@ public class LocationTrackingService extends Service {
         if (latDistance >= 0.001 || lonDistance >= 0.001) {
             latitude = newLat;
             longitude = newLon;
-            TeamBaseActivity.onUpdateUserInfo(mContext, mTeam, mUser);
+            userManager.updateUser(mTeam, mUser);
         }
     }
 }
