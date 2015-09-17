@@ -236,8 +236,6 @@ public class MainActivity extends TeamBaseActivity implements
     }
 
     protected void performLogout() {
-        CacheManager.saveStringCacheData(Constant.CACHE_TEAM_KEY, "");
-        CacheManager.saveStringCacheData(Constant.CACHE_USER_NAME_KEY, "");
         CacheManager.saveStringCacheData(Constant.CACHE_USER_PASSWORD_KEY, "");
         userManager.logout(mTeam, mUser);
     }

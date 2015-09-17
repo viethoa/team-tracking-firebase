@@ -20,6 +20,7 @@ import java.security.NoSuchAlgorithmException;
 
 import javax.inject.Inject;
 
+import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import us.originally.teamtrack.Constant;
@@ -54,13 +55,10 @@ public class LoginActivity extends BaseLoginActivity {
     }
 
     @Override
-    protected void setContentView() {
-        setContentView(R.layout.activity_login);
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_login);
+        ButterKnife.inject(this);
 
         initialiseData();
         initialiseUI();

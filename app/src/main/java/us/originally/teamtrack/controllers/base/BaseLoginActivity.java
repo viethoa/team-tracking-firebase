@@ -11,7 +11,7 @@ import us.originally.teamtrack.modules.dagger.callback.CallbackListener;
 /**
  * Created by VietHoa on 09/09/15.
  */
-public abstract class BaseLoginActivity extends MapBaseActivity {
+public abstract class BaseLoginActivity extends BaseGraphActivity {
 
     protected class LoginOrSubscribeCallback implements CallbackListener<UserTeamModel> {
 

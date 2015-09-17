@@ -13,13 +13,14 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import us.originally.teamtrack.Constant;
 import us.originally.teamtrack.R;
-import us.originally.teamtrack.controllers.base.BaseLoginActivity;
+import us.originally.teamtrack.controllers.base.MapBaseActivity;
 import us.originally.teamtrack.managers.GPSTrackerManager;
 import us.originally.teamtrack.models.TeamModel;
 import us.originally.teamtrack.models.UserTeamModel;
+import us.originally.teamtrack.modules.dagger.callback.CallbackListener;
 import us.originally.teamtrack.modules.dagger.managers.UserManager;
 
-public class LandingActivity extends BaseLoginActivity implements GPSTrackerManager.GPSListener {
+public class LandingActivity extends MapBaseActivity implements GPSTrackerManager.GPSListener {
 
     protected GPSTrackerManager mGpsTracker;
     private double lat, lng = 0;
@@ -96,5 +97,41 @@ public class LandingActivity extends BaseLoginActivity implements GPSTrackerMana
         this.lat = lat;
         this.lng = lng;
         showLocationWithCamera(lat, lng);
+    }
+
+    //----------------------------------------------------------------------------------------------
+    //  Api Helper
+    //----------------------------------------------------------------------------------------------
+
+    protected class LoginOrSubscribeCallback implements CallbackListener<UserTeamModel> {
+
+        private TeamModel teamModel;
+        private UserTeamModel user;
+
+        public LoginOrSubscribeCallback(TeamModel teamModel, UserTeamModel user) {
+            this.teamModel = teamModel;
+            this.user = user;
+        }
+
+        @Override
+        public void onDone(UserTeamModel response, Exception exception) {
+            dismissLoadingDialog();
+            if (exception != null) {
+                showToastErrorMessage(exception.getMessage());
+                return;
+            }
+
+            goToNextScreen(teamModel, user);
+        }
+    }
+
+    protected void goToNextScreen(TeamModel teamModel, UserTeamModel user) {
+        if (teamModel == null || user == null)
+            return;
+
+        CacheManager.saveStringCacheData(Constant.CACHE_TEAM_KEY, teamModel.team_name);
+        CacheManager.saveStringCacheData(Constant.CACHE_USER_NAME_KEY, user.name);
+        CacheManager.saveStringCacheData(Constant.CACHE_USER_PASSWORD_KEY, teamModel.password);
+        startActivity(MainActivity.getInstance(this, teamModel, user));
     }
 }
