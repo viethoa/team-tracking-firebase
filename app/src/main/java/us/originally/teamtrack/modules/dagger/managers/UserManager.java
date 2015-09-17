@@ -13,11 +13,11 @@ public interface UserManager {
 
     void loginOrSubscribe(TeamModel team, UserTeamModel user, CallbackListener<UserTeamModel> listener);
 
-    void logout(TeamModel team, UserTeamModel user);
+    void logout(UserTeamModel user);
 
-    void updateUser(TeamModel team, UserTeamModel user);
+    void updateUser(UserTeamModel user);
 
-    void pushComment(Comment comment, TeamModel team);
+    void pushComment(Comment comment);
 
-    void pushAudio(AudioModel audioModel, TeamModel mTeam);
+    void pushAudio(AudioModel audioModel);
 }

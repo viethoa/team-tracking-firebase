@@ -10,7 +10,8 @@ public class Constant {
     public static final String SLUG_MESSAGE = "messages";
     public static final String SLUG_AUDIOS = "audios";
 
-    public static final String CACHE_TEAM_KEY = "team-name";
-    public static final String CACHE_USER_NAME_KEY = "user-name";
-    public static final String CACHE_USER_PASSWORD_KEY = "user-password";
+    public static final String TEAM_NAME_CACHE_KEY = "team-name";
+    public static final String USER_NAME_CACHE_KEY = "user-name";
+    public static final String TEAM_KEY_CACHE_KEY = "team-node-name";
+    public static final String USER_PASSWORD_CACHE_KEY = "user-password";
 }

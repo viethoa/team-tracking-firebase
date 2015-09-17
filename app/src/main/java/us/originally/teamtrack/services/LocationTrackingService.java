@@ -91,7 +91,7 @@ public class LocationTrackingService extends Service {
 
             mUser.lat = newLat;
             mUser.lng = newLon;
-            userManager.updateUser(mTeam, mUser);
+            userManager.updateUser(mUser);
         }
     }
 }

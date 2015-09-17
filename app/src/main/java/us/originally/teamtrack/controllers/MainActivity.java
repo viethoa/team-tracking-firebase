@@ -221,7 +221,6 @@ public class MainActivity extends TeamBaseActivity implements
                     @Override
                     public void onPositiveButton() {
                         performLogout();
-                        finish();
                     }
 
                     @Override
@@ -236,8 +235,15 @@ public class MainActivity extends TeamBaseActivity implements
     }
 
     protected void performLogout() {
-        CacheManager.saveStringCacheData(Constant.CACHE_USER_PASSWORD_KEY, "");
-        userManager.logout(mTeam, mUser);
+        //Logout and clear cache
+        userManager.logout(mUser);
+        CacheManager.saveStringCacheData(Constant.USER_PASSWORD_CACHE_KEY, "");
+        CacheManager.saveStringCacheData(Constant.TEAM_KEY_CACHE_KEY, "");
+
+        //Stop location tracking service
+        Intent intent = new Intent(this, LocationTrackingService.class);
+        stopService(intent);
+        finish();
     }
 
     protected boolean validUser(UserTeamModel user) {
@@ -306,7 +312,7 @@ public class MainActivity extends TeamBaseActivity implements
         CommentId += 1;
         long timeStamp = System.currentTimeMillis();
         Comment userComment = new Comment(CommentId, timeStamp, comment, mUser);
-        userManager.pushComment(userComment, mTeam);
+        userManager.pushComment(userComment);
     }
 
     protected void takeNotifyComment(Comment comment) {

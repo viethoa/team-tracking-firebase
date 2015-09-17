@@ -49,9 +49,9 @@ public class LandingActivity extends MapBaseActivity implements GPSTrackerManage
     //----------------------------------------------------------------------------------------------
 
     protected void autoLoginLogic() {
-        String teamName = CacheManager.getStringCacheData(Constant.CACHE_TEAM_KEY);
-        String userName = CacheManager.getStringCacheData(Constant.CACHE_USER_NAME_KEY);
-        String password = CacheManager.getStringCacheData(Constant.CACHE_USER_PASSWORD_KEY);
+        String teamName = CacheManager.getStringCacheData(Constant.TEAM_NAME_CACHE_KEY);
+        String userName = CacheManager.getStringCacheData(Constant.USER_NAME_CACHE_KEY);
+        String password = CacheManager.getStringCacheData(Constant.USER_PASSWORD_CACHE_KEY);
         if (StringUtils.isNull(teamName) || StringUtils.isNull(userName) || StringUtils.isNull(password))
             return;
 
@@ -129,9 +129,9 @@ public class LandingActivity extends MapBaseActivity implements GPSTrackerManage
         if (teamModel == null || user == null)
             return;
 
-        CacheManager.saveStringCacheData(Constant.CACHE_TEAM_KEY, teamModel.team_name);
-        CacheManager.saveStringCacheData(Constant.CACHE_USER_NAME_KEY, user.name);
-        CacheManager.saveStringCacheData(Constant.CACHE_USER_PASSWORD_KEY, teamModel.password);
+        CacheManager.saveStringCacheData(Constant.TEAM_NAME_CACHE_KEY, teamModel.team_name);
+        CacheManager.saveStringCacheData(Constant.USER_NAME_CACHE_KEY, user.name);
+        CacheManager.saveStringCacheData(Constant.USER_PASSWORD_CACHE_KEY, teamModel.password);
         startActivity(MainActivity.getInstance(this, teamModel, user));
     }
 }

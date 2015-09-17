@@ -7,6 +7,7 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
+import com.lorem_ipsum.managers.CacheManager;
 import com.lorem_ipsum.utils.DeviceUtils;
 import com.lorem_ipsum.utils.StringUtils;
 
@@ -50,23 +51,21 @@ public class UserManagerImpl implements UserManager {
             return;
         }
 
-        ref = ref.child(Constant.TEAM_GROUP).child(team.team_name);
-        ref.addValueEventListener(new TeamValueListener(ref, team, user, callback));
+        Firebase temRef = ref.child(Constant.TEAM_GROUP);
+        temRef.addValueEventListener(new TeamValueListener(temRef, team, user, callback));
     }
 
     @Override
-    public void logout(TeamModel team, UserTeamModel user) {
-        if (user == null || StringUtils.isNull(user.device_uuid))
-            return;
-
-        if (team == null || StringUtils.isNull(team.team_name))
+    public void logout(UserTeamModel user) {
+        String myTeamKey = CacheManager.getStringCacheData(Constant.TEAM_KEY_CACHE_KEY);
+        if (user == null || StringUtils.isNull(myTeamKey))
             return;
 
         Firebase ref = fireBaseManager.getFireBaseRef();
         if (ref == null)
             return;
 
-        ref.child(Constant.TEAM_GROUP).child(team.team_name).child(Constant.SLUG_USERS).child(user.device_uuid)
+        ref.child(Constant.TEAM_GROUP).child(myTeamKey).child(Constant.SLUG_USERS).child(user.device_uuid)
                 .removeValue(new Firebase.CompletionListener() {
                     @Override
                     public void onComplete(FirebaseError firebaseError, Firebase firebase) {
@@ -80,15 +79,16 @@ public class UserManagerImpl implements UserManager {
     }
 
     @Override
-    public void updateUser(TeamModel team, UserTeamModel user) {
-        if (user == null || team == null || StringUtils.isNull(team.team_name))
+    public void updateUser(UserTeamModel user) {
+        String myTeamKey = CacheManager.getStringCacheData(Constant.TEAM_KEY_CACHE_KEY);
+        if (user == null || StringUtils.isNull(myTeamKey))
             return;
 
         Firebase ref = fireBaseManager.getFireBaseRef();
         if (ref == null)
             return;
 
-        ref.child(Constant.TEAM_GROUP).child(team.team_name).child(Constant.SLUG_USERS)
+        ref.child(Constant.TEAM_GROUP).child(myTeamKey).child(Constant.SLUG_USERS)
                 .child(user.device_uuid).setValue(user, new Firebase.CompletionListener() {
             @Override
             public void onComplete(FirebaseError firebaseError, Firebase firebase) {
@@ -102,8 +102,9 @@ public class UserManagerImpl implements UserManager {
     }
 
     @Override
-    public void pushComment(Comment comment, TeamModel team) {
-        if (comment == null || team == null || StringUtils.isNull(team.team_name))
+    public void pushComment(Comment comment) {
+        String myTeamKey = CacheManager.getStringCacheData(Constant.TEAM_KEY_CACHE_KEY);
+        if (comment == null || StringUtils.isNull(myTeamKey))
             return;
 
         Firebase ref = fireBaseManager.getFireBaseRef();
@@ -111,7 +112,7 @@ public class UserManagerImpl implements UserManager {
             return;
 
         String commentId = comment.time_stamp + "_" + comment.user.device_uuid;
-        ref.child(Constant.TEAM_GROUP).child(team.team_name).child(Constant.SLUG_MESSAGE)
+        ref.child(Constant.TEAM_GROUP).child(myTeamKey).child(Constant.SLUG_MESSAGE)
                 .child(commentId).setValue(comment, new Firebase.CompletionListener() {
             @Override
             public void onComplete(FirebaseError firebaseError, Firebase firebase) {
@@ -125,8 +126,9 @@ public class UserManagerImpl implements UserManager {
     }
 
     @Override
-    public void pushAudio(AudioModel audioModel, TeamModel mTeam) {
-        if (!isAudioValid(audioModel) || mTeam == null || StringUtils.isNull(mTeam.team_name))
+    public void pushAudio(AudioModel audioModel) {
+        String myTeamKey = CacheManager.getStringCacheData(Constant.TEAM_KEY_CACHE_KEY);
+        if (!isAudioValid(audioModel) || StringUtils.isNull(myTeamKey))
             return;
 
         Firebase ref = fireBaseManager.getFireBaseRef();
@@ -134,7 +136,7 @@ public class UserManagerImpl implements UserManager {
             return;
 
         String audioId = "audio_" + audioModel.timestamp;
-        ref.child(Constant.TEAM_GROUP).child(mTeam.team_name).child(Constant.SLUG_AUDIOS)
+        ref.child(Constant.TEAM_GROUP).child(myTeamKey).child(Constant.SLUG_AUDIOS)
                 .child(audioId).setValue(audioModel, new Firebase.CompletionListener() {
             @Override
             public void onComplete(FirebaseError firebaseError, Firebase firebase) {
@@ -152,10 +154,11 @@ public class UserManagerImpl implements UserManager {
     //----------------------------------------------------------------------------------------------
 
     protected void createNewTeam(TeamModel teamModel, UserTeamModel user, Firebase ref) {
-        if (ref == null || teamModel == null || user == null || StringUtils.isNull(teamModel.team_name))
+        if (ref == null || teamModel == null || user == null)
             return;
 
-        ref.setValue(teamModel, new Firebase.CompletionListener() {
+        String myTeamKey = user.device_uuid + "_" + System.currentTimeMillis();
+        ref.child(myTeamKey).setValue(teamModel, new Firebase.CompletionListener() {
             @Override
             public void onComplete(FirebaseError firebaseError, Firebase firebase) {
                 if (firebaseError != null) {
@@ -217,28 +220,12 @@ public class UserManagerImpl implements UserManager {
             Log.d(TAG, dataSnapshot.toString());
             ref.removeEventListener(this);
 
+            //Team has been created
+            if (teamHasBeenCreated(dataSnapshot))
+                return;
+
             //Create New Team
-            if (dataSnapshot.getValue() == null) {
-                createNewTeam(teamModel, user, ref);
-                if (callback != null) {
-                    callback.onDone(user, null);
-                }
-                return;
-            }
-
-            //Invalid Password
-            DataSnapshot passwordSnapshot = dataSnapshot.child("password");
-            String teamPassword = passwordSnapshot.getValue(String.class);
-            Log.d(TAG, "password: " + teamPassword);
-            if (StringUtils.isNull(teamModel.password) || !teamModel.password.equals(teamPassword)) {
-                if (callback != null) {
-                    callback.onDone(null, new IllegalAccessException("Invalid password !"));
-                }
-                return;
-            }
-
-            //User Subscribe To Team
-            addNewUserToTeam(user, ref);
+            createNewTeam(teamModel, user, ref);
             if (callback != null) {
                 callback.onDone(user, null);
             }
@@ -250,6 +237,44 @@ public class UserManagerImpl implements UserManager {
             if (callback != null) {
                 callback.onDone(null, new IllegalAccessException(firebaseError.getMessage()));
             }
+        }
+
+        protected boolean teamHasBeenCreated(DataSnapshot usersSnapShot) {
+            if (usersSnapShot == null || usersSnapShot.getValue() == null)
+                return false;
+
+            for (DataSnapshot userSnapshot : usersSnapShot.getChildren()) {
+                //Check Team Name
+                DataSnapshot userNameSnapshot = userSnapshot.child("team_name");
+                String userName = userNameSnapshot.getValue(String.class);
+                Log.d(TAG, "userName: " + userName);
+                if (StringUtils.isNull(userName) || !teamModel.team_name.equals(userName))
+                    continue;
+
+                //Check Password
+                DataSnapshot passwordSnapshot = userSnapshot.child("password");
+                String password = passwordSnapshot.getValue(String.class);
+                Log.d(TAG, "password: " + password);
+                if (StringUtils.isNull(password) || !teamModel.password.equals(password)) {
+                    if (callback != null) {
+                        callback.onDone(null, new IllegalAccessException("Invalid password !"));
+                    }
+                    return true;
+                }
+
+                //Take subscribe
+                String key = userSnapshot.getKey();
+                Log.d(TAG, "key: " + key);
+                CacheManager.saveStringCacheData(Constant.TEAM_KEY_CACHE_KEY, key);
+                Firebase teamNode = ref.child(key);
+                addNewUserToTeam(user, teamNode);
+                if (callback != null) {
+                    callback.onDone(user, null);
+                }
+                return true;
+            }
+
+            return false;
         }
     }
 }

@@ -78,13 +78,13 @@ public class LoginActivity extends BaseLoginActivity {
         myLng = bundle.getDouble(EXTEC_LONGTITUDE);
 
         //Data Cache
-        String teamName = CacheManager.getStringCacheData(Constant.CACHE_TEAM_KEY);
+        String teamName = CacheManager.getStringCacheData(Constant.TEAM_NAME_CACHE_KEY);
         if (StringUtils.isNotNull(teamName)) {
             etTeam.setText(teamName);
             etName.requestFocus();
         }
 
-        String userName = CacheManager.getStringCacheData(Constant.CACHE_USER_NAME_KEY);
+        String userName = CacheManager.getStringCacheData(Constant.USER_NAME_CACHE_KEY);
         if (StringUtils.isNotNull(userName)) {
             etName.setText(userName);
             etPassword.requestFocus();

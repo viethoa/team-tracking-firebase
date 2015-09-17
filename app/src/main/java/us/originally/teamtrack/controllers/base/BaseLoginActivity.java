@@ -39,9 +39,9 @@ public abstract class BaseLoginActivity extends BaseGraphActivity {
         if (teamModel == null || user == null)
             return;
 
-        CacheManager.saveStringCacheData(Constant.CACHE_TEAM_KEY, teamModel.team_name);
-        CacheManager.saveStringCacheData(Constant.CACHE_USER_NAME_KEY, user.name);
-        CacheManager.saveStringCacheData(Constant.CACHE_USER_PASSWORD_KEY, teamModel.password);
+        CacheManager.saveStringCacheData(Constant.TEAM_NAME_CACHE_KEY, teamModel.team_name);
+        CacheManager.saveStringCacheData(Constant.USER_NAME_CACHE_KEY, user.name);
+        CacheManager.saveStringCacheData(Constant.USER_PASSWORD_CACHE_KEY, teamModel.password);
         startActivity(MainActivity.getInstance(this, teamModel, user));
         finish();
     }
