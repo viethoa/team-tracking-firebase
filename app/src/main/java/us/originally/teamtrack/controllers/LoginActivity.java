@@ -18,15 +18,19 @@ import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import javax.inject.Inject;
+
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import us.originally.teamtrack.R;
-import us.originally.teamtrack.controllers.base.BaseLoginActivity;
+import us.originally.teamtrack.controllers.base.BaseGraphActivity;
 import us.originally.teamtrack.models.TeamModel;
 import us.originally.teamtrack.models.UserTeamModel;
+import us.originally.teamtrack.modules.dagger.callback.CallbackListener;
+import us.originally.teamtrack.modules.dagger.managers.UserManager;
 
-public class LoginActivity extends BaseLoginActivity {
+public class LoginActivity extends BaseGraphActivity {
 
     private static final String CACHE_TEAM_KEY = "team-name";
     private static final String CACHE_USER_NAME_KEY = "user-name";
@@ -41,6 +45,9 @@ public class LoginActivity extends BaseLoginActivity {
     EditText etTeam;
     @InjectView(R.id.et_password)
     EditText etPassword;
+
+    @Inject
+    UserManager userManager;
 
     public static Intent getInstance(Context context, double lat, double lng) {
         Intent intent = new Intent(context, LoginActivity.class);
@@ -138,14 +145,26 @@ public class LoginActivity extends BaseLoginActivity {
         String password = takePasswordMd5(etPassword.getText().toString());
         long timeStamp = System.currentTimeMillis();
 
-        UserTeamModel user = new UserTeamModel(id, yourName, myLat, myLng);
-        TeamModel teamModel = new TeamModel(teamName, password, timeStamp);
+        final UserTeamModel user = new UserTeamModel(id, yourName, myLat, myLng);
+        final TeamModel teamModel = new TeamModel(teamName, password, timeStamp);
 
         showLoadingDialog();
-        takeLoginOrSubscribe(teamModel, user);
+        //takeLoginOrSubscribe(teamModel, user);
+        userManager.loginOrSubscribe(teamModel, user, new CallbackListener<UserTeamModel>() {
+            @Override
+            public void onDone(UserTeamModel response, Exception exception) {
+                dismissLoadingDialog();
+                if (exception != null) {
+                    showToastErrorMessage(exception.getMessage());
+                    return;
+                }
+
+                goToNextScreen(teamModel, user);
+            }
+        });
     }
 
-    @Override
+    //@Override
     protected void goToNextScreen(TeamModel teamModel, UserTeamModel user) {
         if (teamModel == null || user == null)
             return;

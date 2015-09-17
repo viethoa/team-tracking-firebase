@@ -47,11 +47,7 @@ dependencies {
     }
     compile project(':libraries:CustomDialog')
     compile project(':libraries:LoremIpsumLib')
-    compile fileTree(
-            dir: 'libs',
-            excludes: ['android-support-v4.jar', 'android-support-v13.jar', 'android-support-v7-appcompat.jar'],
-            include: ['*.jar']
-    )
+    compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:design:22.2.0'
     compile 'com.android.support:support-v4:22.0.0'
     compile 'com.android.support:appcompat-v7:22.0.0'

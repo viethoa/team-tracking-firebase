@@ -11,7 +11,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.lorem_ipsum.activities.BaseActivity;
 import com.lorem_ipsum.utils.StringUtils;
 
 import java.util.ArrayList;
@@ -24,7 +23,7 @@ import us.originally.teamtrack.models.UserTeamModel;
 /**
  * Created by VietHoa on 09/09/15.
  */
-public abstract class MapBaseActivity extends BaseActivity {
+public abstract class MapBaseActivity extends BaseGraphActivity {
 
     protected class UserOnMap {
         public UserTeamModel user;
