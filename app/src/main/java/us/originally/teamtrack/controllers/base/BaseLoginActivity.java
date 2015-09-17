@@ -43,5 +43,6 @@ public abstract class BaseLoginActivity extends BaseGraphActivity {
         CacheManager.saveStringCacheData(Constant.CACHE_USER_NAME_KEY, user.name);
         CacheManager.saveStringCacheData(Constant.CACHE_USER_PASSWORD_KEY, teamModel.password);
         startActivity(MainActivity.getInstance(this, teamModel, user));
+        finish();
     }
 }

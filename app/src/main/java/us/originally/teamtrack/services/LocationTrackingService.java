@@ -25,10 +25,8 @@ public class LocationTrackingService extends Service {
 
     private static final String TAG = "TrackingLocationService";
     private static final int TRACKING_TIME = 5000;
-    private static final int DISTANCE_TRACKING = 1;
+    private static final double DISTANCE_TRACKING = 1f;
 
-    private static double latitude = 0;
-    private static double longitude = 0;
     private static TeamModel mTeam = null;
     private static UserTeamModel mUser = null;
     private static GPSTrackerManager mGpsTracker;
@@ -86,13 +84,16 @@ public class LocationTrackingService extends Service {
         float[] results = new float[1];
         results[0] = 0;
 
-        Location.distanceBetween(latitude, longitude, newLat, newLon, results);
-        if (results[0] > DISTANCE_TRACKING) {
+        Location.distanceBetween(mUser.lat, mUser.lng, newLat, newLon, results);
+        double distance = results[0];
+
+        Log.d(TAG, String.valueOf(distance));
+        if (distance > DISTANCE_TRACKING) {
             Log.d(TAG, String.valueOf(newLat));
             Log.d(TAG, String.valueOf(newLon));
 
-            latitude = newLat;
-            longitude = newLon;
+            mUser.lat = newLat;
+            mUser.lng = newLon;
             userManager.updateUser(mTeam, mUser);
         }
     }
