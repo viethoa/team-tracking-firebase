@@ -84,8 +84,9 @@ public class LocationTrackingService extends Service {
         double newLat = mGpsTracker.getLatitude();
         double newLon = mGpsTracker.getLongitude();
         float[] results = new float[1];
-        Location.distanceBetween(latitude, longitude, newLat, newLon, results);
+        results[0] = 0;
 
+        Location.distanceBetween(latitude, longitude, newLat, newLon, results);
         if (results[0] > DISTANCE_TRACKING) {
             Log.d(TAG, String.valueOf(newLat));
             Log.d(TAG, String.valueOf(newLon));

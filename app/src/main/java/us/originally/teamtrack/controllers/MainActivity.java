@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.view.View;
 import android.widget.TextView;
 
+import com.lorem_ipsum.managers.CacheManager;
 import com.lorem_ipsum.utils.DeviceUtils;
 import com.lorem_ipsum.utils.StringUtils;
 import com.viethoa.DialogUtils;
@@ -21,6 +22,7 @@ import javax.inject.Inject;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import de.greenrobot.event.EventBus;
+import us.originally.teamtrack.Constant;
 import us.originally.teamtrack.EventBus.VisualizeEvent;
 import us.originally.teamtrack.R;
 import us.originally.teamtrack.controllers.base.TeamBaseActivity;
@@ -234,7 +236,10 @@ public class MainActivity extends TeamBaseActivity implements
     }
 
     protected void performLogout() {
-         userManager.logout(mTeam, mUser);
+        CacheManager.saveStringCacheData(Constant.CACHE_TEAM_KEY, "");
+        CacheManager.saveStringCacheData(Constant.CACHE_USER_NAME_KEY, "");
+        CacheManager.saveStringCacheData(Constant.CACHE_USER_PASSWORD_KEY, "");
+        userManager.logout(mTeam, mUser);
     }
 
     protected boolean validUser(UserTeamModel user) {

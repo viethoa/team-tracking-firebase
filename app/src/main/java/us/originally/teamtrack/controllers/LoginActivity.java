@@ -20,20 +20,17 @@ import java.security.NoSuchAlgorithmException;
 
 import javax.inject.Inject;
 
-import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
+import us.originally.teamtrack.Constant;
 import us.originally.teamtrack.R;
-import us.originally.teamtrack.controllers.base.BaseGraphActivity;
+import us.originally.teamtrack.controllers.base.BaseLoginActivity;
 import us.originally.teamtrack.models.TeamModel;
 import us.originally.teamtrack.models.UserTeamModel;
-import us.originally.teamtrack.modules.dagger.callback.CallbackListener;
 import us.originally.teamtrack.modules.dagger.managers.UserManager;
 
-public class LoginActivity extends BaseGraphActivity {
+public class LoginActivity extends BaseLoginActivity {
 
-    private static final String CACHE_TEAM_KEY = "team-name";
-    private static final String CACHE_USER_NAME_KEY = "user-name";
     private static final String EXTEC_LATITUDE = "latitude";
     private static final String EXTEC_LONGTITUDE = "longtitude";
     private double myLat;
@@ -57,10 +54,13 @@ public class LoginActivity extends BaseGraphActivity {
     }
 
     @Override
+    protected void setContentView() {
+        setContentView(R.layout.activity_login);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
-        ButterKnife.inject(this);
 
         initialiseData();
         initialiseUI();
@@ -80,13 +80,13 @@ public class LoginActivity extends BaseGraphActivity {
         myLng = bundle.getDouble(EXTEC_LONGTITUDE);
 
         //Data Cache
-        String teamName = CacheManager.getStringCacheData(CACHE_TEAM_KEY);
+        String teamName = CacheManager.getStringCacheData(Constant.CACHE_TEAM_KEY);
         if (StringUtils.isNotNull(teamName)) {
             etTeam.setText(teamName);
             etName.requestFocus();
         }
 
-        String userName = CacheManager.getStringCacheData(CACHE_USER_NAME_KEY);
+        String userName = CacheManager.getStringCacheData(Constant.CACHE_USER_NAME_KEY);
         if (StringUtils.isNotNull(userName)) {
             etName.setText(userName);
             etPassword.requestFocus();
@@ -197,40 +197,5 @@ public class LoginActivity extends BaseGraphActivity {
         }
 
         return true;
-    }
-
-    //----------------------------------------------------------------------------------------------
-    //  Api helper
-    //----------------------------------------------------------------------------------------------
-
-    protected class LoginOrSubscribeCallback implements CallbackListener<UserTeamModel> {
-
-        private TeamModel teamModel;
-        private UserTeamModel user;
-
-        public LoginOrSubscribeCallback(TeamModel teamModel, UserTeamModel user) {
-            this.teamModel = teamModel;
-            this.user = user;
-        }
-
-        @Override
-        public void onDone(UserTeamModel response, Exception exception) {
-            dismissLoadingDialog();
-            if (exception != null) {
-                showToastErrorMessage(exception.getMessage());
-                return;
-            }
-
-            goToNextScreen(teamModel, user);
-        }
-    }
-
-    protected void goToNextScreen(TeamModel teamModel, UserTeamModel user) {
-        if (teamModel == null || user == null)
-            return;
-
-        CacheManager.saveStringCacheData(CACHE_TEAM_KEY, teamModel.team_name);
-        CacheManager.saveStringCacheData(CACHE_USER_NAME_KEY, user.name);
-        startActivity(MainActivity.getInstance(this, teamModel, user));
     }
 }
