@@ -29,7 +29,6 @@ public class LocationTrackingService extends Service {
 
     private static TeamModel mTeam = null;
     private static UserTeamModel mUser = null;
-    private static GPSTrackerManager mGpsTracker;
 
     @Inject
     UserManager userManager;
@@ -74,15 +73,13 @@ public class LocationTrackingService extends Service {
             return;
 
         Log.d(TAG, "Location service tracker");
-        if (mGpsTracker == null)
-            mGpsTracker = new GPSTrackerManager(getApplicationContext());
+        GPSTrackerManager mGpsTracker = new GPSTrackerManager(getApplicationContext());
         if (!mGpsTracker.canGetLocation())
             return;
 
         double newLat = mGpsTracker.getLatitude();
         double newLon = mGpsTracker.getLongitude();
         float[] results = new float[1];
-        results[0] = 0;
 
         Location.distanceBetween(mUser.lat, mUser.lng, newLat, newLon, results);
         double distance = results[0];
