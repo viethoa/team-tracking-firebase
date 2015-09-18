@@ -21,7 +21,7 @@ import us.originally.teamtrack.modules.chat.audio.AudioStreamManager;
 public class AudioPlayerManage {
 
     private static final String TAG = "AudioPlayerManage";
-    private static final int LIMIT_TIME_TO_PLAY = 10;
+    private static final int LIMIT_TIME_TO_PLAY = 30;
 
     protected static ChildEventListener childEventListener;
     private static Context mContext;

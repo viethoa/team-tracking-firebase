@@ -128,12 +128,16 @@ public class UserManagerImpl implements UserManager {
     @Override
     public void pushAudio(AudioModel audioModel) {
         String myTeamKey = CacheManager.getStringCacheData(Constant.TEAM_KEY_CACHE_KEY);
-        if (!isAudioValid(audioModel) || StringUtils.isNull(myTeamKey))
+        if (!isAudioValid(audioModel) || StringUtils.isNull(myTeamKey)) {
+            Log.d(TAG, "Data syntax error in Record audio");
             return;
+        }
 
         Firebase ref = fireBaseManager.getFireBaseRef();
-        if (ref == null)
+        if (ref == null) {
+            Log.d(TAG, "FireBase syntax error in Record audio");
             return;
+        }
 
         String audioId = "audio_" + audioModel.id;
         ref.child(Constant.TEAM_GROUP).child(myTeamKey).child(Constant.SLUG_AUDIOS)

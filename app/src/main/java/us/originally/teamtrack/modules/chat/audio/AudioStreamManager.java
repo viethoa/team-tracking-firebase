@@ -80,7 +80,7 @@ public class AudioStreamManager {
     //**********************************************************************************************
 
     public static boolean isRecording() {
-        return mPlayer != null;
+        return mRecorder != null;
     }
 
     public static void startRecording(UserTeamModel user, UserManager userManager) {

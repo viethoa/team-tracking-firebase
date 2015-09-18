@@ -371,8 +371,10 @@ public class MainActivity extends TeamBaseActivity implements
 
     @Override
     public void onSpeaking() {
-        if (AudioStreamManager.isRecording() || mTeam == null || mUser == null)
+        if (AudioStreamManager.isRecording() || mTeam == null || mUser == null) {
+            logDebug("record audio with data syntax");
             return;
+        }
 
         new Thread(new Runnable() {
             @Override
