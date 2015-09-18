@@ -51,25 +51,15 @@ public class AudioPlayerManage {
 
         childEventListener = new ChildEventListener() {
             @Override
-            public void onChildAdded(final DataSnapshot dataSnapshot, String s) {
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Log.d(TAG, "user taking: " + dataSnapshot.getValue());
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        onReceiveAudio(dataSnapshot);
-                    }
-                }).start();
+                onReceiveAudio(dataSnapshot);
             }
 
             @Override
             public void onChildChanged(final DataSnapshot dataSnapshot, String s) {
                 Log.d(TAG, "user taking: " + dataSnapshot.getValue());
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        onReceiveAudio(dataSnapshot);
-                    }
-                }).start();
+                onReceiveAudio(dataSnapshot);
             }
 
             @Override

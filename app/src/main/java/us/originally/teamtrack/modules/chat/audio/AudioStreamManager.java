@@ -26,11 +26,11 @@ public class AudioStreamManager {
     private static int channelConfig = AudioFormat.CHANNEL_IN_MONO;
     private static int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
     private static int minBufSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat);
-    private static int bufferSize = 4096;
+    private static int bufferSize = 10240;
 
     private static CMG711 uLawCodec = new CMG711();
     private static EventBus eventBus = new EventBus();
-    private static int audio_limit_id = 100;
+    private static int audio_limit_id = 50;
 
     //**********************************************************************************************
     //  Player
@@ -43,7 +43,7 @@ public class AudioStreamManager {
         mPlayer.play();
     }
 
-    public static void startPlaying(AudioModel audioModel) {
+    public static void startPlaying(final AudioModel audioModel) {
         if (mPlayer == null) {
             initialisePlayer();
         }
@@ -52,11 +52,19 @@ public class AudioStreamManager {
         byte[] audio = Base64.decode(audioModel.encode, 2);
 
         //uLaw Decoding
-        byte[] byteArray = new byte[audioModel.size * 2];
+        final byte[] byteArray = new byte[audioModel.size * 2];
         uLawCodec.decode(audio, 0, audioModel.size, byteArray);
 
         //Play
-        mPlayer.write(byteArray, 0, audioModel.size);
+        final byte[] buffer = byteArray;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (mPlayer) {
+                    mPlayer.write(buffer, 0, audioModel.size);
+                }
+            }
+        }).start();
     }
 
     public static void stopPlaying() {

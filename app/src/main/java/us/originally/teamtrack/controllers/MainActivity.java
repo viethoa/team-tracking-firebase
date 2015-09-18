@@ -218,7 +218,7 @@ public class MainActivity extends TeamBaseActivity implements
         String negativeButton = getString(R.string.dialog_cancel);
         String positiveButton = getString(R.string.dialog_ok);
         final Dialog gpsSettingDialog = DialogUtils.createDialogMessage(this, title,
-                message, negativeButton, positiveButton, false, new DialogUtils.DialogListener() {
+                message, negativeButton, positiveButton, true, new DialogUtils.DialogListener() {
                     @Override
                     public void onPositiveButton() {
                         performLogout();

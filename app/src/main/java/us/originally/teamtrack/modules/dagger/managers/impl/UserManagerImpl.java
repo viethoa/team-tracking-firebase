@@ -36,7 +36,7 @@ public class UserManagerImpl implements UserManager {
 
     @Override
     public void loginOrSubscribe(TeamModel team, UserTeamModel user, CallbackListener<UserTeamModel> callback) {
-        if (team == null || user == null || StringUtils.isNull(team.team_name)) {
+        if (!validTeamModel(team) || !validUserModel(user)) {
             if (callback != null) {
                 callback.onDone(null, new IllegalAccessException("Data syntax error"));
             }
@@ -46,7 +46,7 @@ public class UserManagerImpl implements UserManager {
         Firebase ref = fireBaseManager.getFireBaseRef();
         if (ref == null) {
             if (callback != null) {
-                callback.onDone(null, new IllegalAccessException("FireBase syntax error"));
+                callback.onDone(null, new IllegalAccessException("System syntax error"));
             }
             return;
         }
@@ -169,7 +169,10 @@ public class UserManagerImpl implements UserManager {
             }
         });
 
-        addNewUserToTeam(user, ref);
+        //Save Node's Key Name
+        CacheManager.saveStringCacheData(Constant.TEAM_KEY_CACHE_KEY, myTeamKey);
+        Firebase myTeamRef = ref.child(myTeamKey);
+        addNewUserToTeam(user, myTeamRef);
     }
 
     protected void addNewUserToTeam(UserTeamModel user, Firebase ref) {
@@ -201,15 +204,23 @@ public class UserManagerImpl implements UserManager {
     //  FireBase Api helper
     //----------------------------------------------------------------------------------------------
 
+    protected boolean validTeamModel(TeamModel team) {
+        return (team != null && StringUtils.isNotNull(team.team_name) && StringUtils.isNotNull(team.password));
+    }
+
+    protected boolean validUserModel(UserTeamModel user) {
+        return (user != null && StringUtils.isNotNull(user.name));
+    }
+
     protected class TeamValueListener implements ValueEventListener {
 
         private Firebase ref;
-        private TeamModel teamModel;
+        private TeamModel team;
         private UserTeamModel user;
         private CallbackListener<UserTeamModel> callback;
 
         public TeamValueListener(Firebase ref, TeamModel teamModel, UserTeamModel user, CallbackListener<UserTeamModel> callback) {
-            this.teamModel = teamModel;
+            this.team = teamModel;
             this.callback = callback;
             this.user = user;
             this.ref = ref;
@@ -217,15 +228,28 @@ public class UserManagerImpl implements UserManager {
 
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-            Log.d(TAG, dataSnapshot.toString());
+            if (ref == null) {
+                if (callback != null) {
+                    callback.onDone(null, new IllegalAccessException("System syntax error"));
+                }
+                return;
+            }
+
             ref.removeEventListener(this);
+            Log.d(TAG, dataSnapshot.toString());
+            if (!validTeamModel(team) || !validUserModel(user)) {
+                if (callback != null) {
+                    callback.onDone(null, new IllegalAccessException("Data syntax error"));
+                }
+                return;
+            }
 
             //Team has been created
             if (teamHasBeenCreated(dataSnapshot))
                 return;
 
             //Create New Team
-            createNewTeam(teamModel, user, ref);
+            createNewTeam(team, user, ref);
             if (callback != null) {
                 callback.onDone(user, null);
             }
@@ -248,30 +272,27 @@ public class UserManagerImpl implements UserManager {
                 DataSnapshot userNameSnapshot = userSnapshot.child("team_name");
                 String userName = userNameSnapshot.getValue(String.class);
                 Log.d(TAG, "userName: " + userName);
-                if (StringUtils.isNull(userName) || !teamModel.team_name.equals(userName))
+                if (StringUtils.isNull(userName) || !team.team_name.equals(userName))
                     continue;
 
                 //Check Password
                 DataSnapshot passwordSnapshot = userSnapshot.child("password");
                 String password = passwordSnapshot.getValue(String.class);
                 Log.d(TAG, "password: " + password);
-                if (StringUtils.isNull(password) || !teamModel.password.equals(password)) {
+                if (StringUtils.isNotNull(password) && team.password.equals(password)) {
+
+                    //Save Node's Key Name
+                    String key = userSnapshot.getKey();
+                    CacheManager.saveStringCacheData(Constant.TEAM_KEY_CACHE_KEY, key);
+
+                    //Take subscribe
+                    Firebase teamNode = ref.child(key);
+                    addNewUserToTeam(user, teamNode);
                     if (callback != null) {
-                        callback.onDone(null, new IllegalAccessException("Invalid password !"));
+                        callback.onDone(user, null);
                     }
                     return true;
                 }
-
-                //Take subscribe
-                String key = userSnapshot.getKey();
-                Log.d(TAG, "key: " + key);
-                CacheManager.saveStringCacheData(Constant.TEAM_KEY_CACHE_KEY, key);
-                Firebase teamNode = ref.child(key);
-                addNewUserToTeam(user, teamNode);
-                if (callback != null) {
-                    callback.onDone(user, null);
-                }
-                return true;
             }
 
             return false;
