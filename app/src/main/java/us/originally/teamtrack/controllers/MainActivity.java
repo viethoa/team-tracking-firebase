@@ -34,6 +34,7 @@ import us.originally.teamtrack.models.TeamModel;
 import us.originally.teamtrack.models.UserTeamModel;
 import us.originally.teamtrack.modules.chat.audio.AudioStreamManager;
 import us.originally.teamtrack.modules.dagger.managers.UserManager;
+import us.originally.teamtrack.services.AudioService;
 import us.originally.teamtrack.services.LocationTrackingService;
 
 public class MainActivity extends TeamBaseActivity implements
@@ -241,8 +242,13 @@ public class MainActivity extends TeamBaseActivity implements
         CacheManager.saveStringCacheData(Constant.TEAM_KEY_CACHE_KEY, "");
 
         //Stop location tracking service
-        Intent intent = new Intent(this, LocationTrackingService.class);
-        stopService(intent);
+        Intent locationTrackingService = new Intent(this, LocationTrackingService.class);
+        stopService(locationTrackingService);
+
+        //Stop audio play service
+        Intent audioService = new Intent(this, AudioService.class);
+        stopService(audioService);
+
         finish();
     }
 
@@ -371,7 +377,7 @@ public class MainActivity extends TeamBaseActivity implements
         new Thread(new Runnable() {
             @Override
             public void run() {
-                AudioStreamManager.startRecording(MainActivity.this, mTeam, mUser);
+                AudioStreamManager.startRecording(mUser, userManager);
             }
         }).start();
     }

@@ -117,7 +117,8 @@ public class AudioRecordManager {
             String strEncoded = Base64.encodeToString(outBuffer, 2);
 
             //Capture audio
-            AudioModel item = new AudioModel(strEncoded, size, String.valueOf(audioTimeStamp), null);
+            long timeStamp = System.currentTimeMillis();
+            AudioModel item = new AudioModel(strEncoded, size, audioTimeStamp, timeStamp, null);
             AudiosEndCoded.add(item);
         }
     }

@@ -9,10 +9,11 @@ import dagger.Provides;
 import us.originally.teamtrack.controllers.LandingActivity;
 import us.originally.teamtrack.controllers.LoginActivity;
 import us.originally.teamtrack.controllers.MainActivity;
+import us.originally.teamtrack.managers.AudioPlayerManage;
 import us.originally.teamtrack.managers.FireBaseManager;
 import us.originally.teamtrack.modules.dagger.managers.UserManager;
 import us.originally.teamtrack.modules.dagger.managers.impl.UserManagerImpl;
-import us.originally.teamtrack.modules.firebase.FireBaseAction;
+import us.originally.teamtrack.services.AudioService;
 import us.originally.teamtrack.services.LocationTrackingService;
 
 /**
@@ -23,11 +24,11 @@ import us.originally.teamtrack.services.LocationTrackingService;
         complete = false,
         library = true,
         injects = {
-                UserManager.class,
                 MainActivity.class,
                 LoginActivity.class,
                 LandingActivity.class,
-                LocationTrackingService.class
+                LocationTrackingService.class,
+                AudioService.class
         }
 )
 
@@ -41,8 +42,8 @@ public class RequestModule {
 
     @Provides
     @Singleton
-    public FireBaseAction provideFireBaseAction() {
-        return new FireBaseAction();
+    public AudioPlayerManage provideAudioPlayerManage(Context applicationContext) {
+        return new AudioPlayerManage(applicationContext);
     }
 
     @Provides

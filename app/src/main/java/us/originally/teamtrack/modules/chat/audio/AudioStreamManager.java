@@ -1,6 +1,5 @@
 package us.originally.teamtrack.modules.chat.audio;
 
-import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
@@ -11,8 +10,8 @@ import android.util.Log;
 import de.greenrobot.event.EventBus;
 import us.originally.teamtrack.EventBus.VisualizeEvent;
 import us.originally.teamtrack.models.AudioModel;
-import us.originally.teamtrack.models.TeamModel;
 import us.originally.teamtrack.models.UserTeamModel;
+import us.originally.teamtrack.modules.dagger.managers.UserManager;
 
 /**
  * Created by VietHoa on 07/09/15.
@@ -27,9 +26,11 @@ public class AudioStreamManager {
     private static int channelConfig = AudioFormat.CHANNEL_IN_MONO;
     private static int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
     private static int minBufSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat);
+    private static int bufferSize = 4096;
 
     private static CMG711 uLawCodec = new CMG711();
     private static EventBus eventBus = new EventBus();
+    private static int audio_limit_id = 100;
 
     //**********************************************************************************************
     //  Player
@@ -74,19 +75,18 @@ public class AudioStreamManager {
         return mPlayer != null;
     }
 
-    public static void startRecording(Context context, TeamModel team, UserTeamModel user) {
+    public static void startRecording(UserTeamModel user, UserManager userManager) {
         mRecorder = new AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, channelConfig, audioFormat, minBufSize * 10);
         mRecorder.startRecording();
-        int audioTimeStamp = 0;
+        int audioId = 0;
 
         //Encoding:
-        byte[] buffer = new byte[10240];
-        byte[] outBuffer = new byte[10240];
+        byte[] buffer = new byte[bufferSize];
+        byte[] outBuffer = new byte[bufferSize];
         int size;
 
         //Capture audio
         while (mRecorder != null) {
-            audioTimeStamp += 1;
             size = mRecorder.read(buffer, 0, buffer.length);
 
             //Take audio waveform
@@ -100,8 +100,13 @@ public class AudioStreamManager {
             String strEncoded = Base64.encodeToString(outBuffer, 2);
 
             //Stream audio data
-            AudioModel audio = new AudioModel(strEncoded, size, String.valueOf(audioTimeStamp), user);
-            //userManager.pushAudio(context, audio, team);
+            audioId += 1;
+            if (audioId > audio_limit_id) {
+                audioId = 1;
+            }
+            long timeStamp = System.currentTimeMillis();
+            AudioModel audio = new AudioModel(strEncoded, size, audioId, timeStamp, user);
+            userManager.pushAudio(audio);
         }
     }
 

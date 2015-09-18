@@ -135,7 +135,7 @@ public class UserManagerImpl implements UserManager {
         if (ref == null)
             return;
 
-        String audioId = "audio_" + audioModel.timestamp;
+        String audioId = "audio_" + audioModel.id;
         ref.child(Constant.TEAM_GROUP).child(myTeamKey).child(Constant.SLUG_AUDIOS)
                 .child(audioId).setValue(audioModel, new Firebase.CompletionListener() {
             @Override

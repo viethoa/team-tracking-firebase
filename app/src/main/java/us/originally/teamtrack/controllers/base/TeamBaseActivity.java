@@ -1,11 +1,13 @@
 package us.originally.teamtrack.controllers.base;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
+import com.lorem_ipsum.managers.CacheManager;
 import com.lorem_ipsum.utils.AppUtils;
 import com.lorem_ipsum.utils.StringUtils;
 
@@ -14,11 +16,10 @@ import javax.inject.Inject;
 import us.originally.teamtrack.Constant;
 import us.originally.teamtrack.customviews.VisualizerView;
 import us.originally.teamtrack.managers.FireBaseManager;
-import us.originally.teamtrack.models.AudioModel;
 import us.originally.teamtrack.models.Comment;
 import us.originally.teamtrack.models.TeamModel;
 import us.originally.teamtrack.models.UserTeamModel;
-import us.originally.teamtrack.modules.chat.audio.AudioStreamManager;
+import us.originally.teamtrack.services.AudioService;
 
 /**
  * Created by VietHoa on 14/09/15.
@@ -55,14 +56,15 @@ public abstract class TeamBaseActivity extends MapBaseActivity implements
     protected abstract void onShowComment(Comment message);
 
     protected void initialiseTeamMessage() {
-        if (mTeam == null || StringUtils.isNull(mTeam.team_name))
+        String myTeamKey = CacheManager.getStringCacheData(Constant.TEAM_KEY_CACHE_KEY);
+        if (StringUtils.isNull(myTeamKey))
             return;
 
         Firebase ref = fireBaseManager.getFireBaseRef();
         if (ref == null)
             return;
 
-        ref.child(Constant.TEAM_GROUP).child(mTeam.team_name).child(Constant.SLUG_MESSAGE)
+        ref.child(Constant.TEAM_GROUP).child(myTeamKey).child(Constant.SLUG_MESSAGE)
                 .addChildEventListener(new MessagesEventListener());
     }
 
@@ -117,14 +119,15 @@ public abstract class TeamBaseActivity extends MapBaseActivity implements
     protected abstract void onUserMoveOut(UserTeamModel user);
 
     protected void initialiseTeamUser() {
-        if (mTeam == null || StringUtils.isNull(mTeam.team_name))
+        String myTeamKey = CacheManager.getStringCacheData(Constant.TEAM_KEY_CACHE_KEY);
+        if (StringUtils.isNull(myTeamKey))
             return;
 
         Firebase ref = fireBaseManager.getFireBaseRef();
         if (ref == null)
             return;
 
-        ref.child(Constant.TEAM_GROUP).child(mTeam.team_name).child(Constant.SLUG_USERS)
+        ref.child(Constant.TEAM_GROUP).child(myTeamKey).child(Constant.SLUG_USERS)
                 .addChildEventListener(new UsersEventListener());
     }
 
@@ -203,63 +206,10 @@ public abstract class TeamBaseActivity extends MapBaseActivity implements
     //----------------------------------------------------------------------------------------------
 
     protected void initialiseAudio() {
-        if (mTeam == null || StringUtils.isNull(mTeam.team_name))
+        if (mUser == null)
             return;
 
-        Firebase ref = fireBaseManager.getFireBaseRef();
-        if (ref == null)
-            return;
-
-        ref.child(Constant.TEAM_GROUP).child(mTeam.team_name).child(Constant.SLUG_AUDIOS)
-                .addChildEventListener(new AudioEventListener());
-    }
-
-    protected boolean onReceiveAudio(DataSnapshot dataSnapshot) {
-        AudioModel audio = null;
-        try {
-            audio = dataSnapshot.getValue(AudioModel.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (audio == null)
-            return false;
-
-        //Do not play audio by myself
-        if (mUser != null && StringUtils.isNotNull(mUser.device_uuid) &&
-                audio.user != null && StringUtils.isNotNull(audio.user.device_uuid) &&
-                audio.user.device_uuid.equals(mUser.device_uuid))
-            return true;
-
-        AudioStreamManager.startPlaying(audio);
-        return true;
-    }
-
-    public class AudioEventListener implements ChildEventListener {
-
-        @Override
-        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-            logDebug("user taking: " + dataSnapshot.getValue());
-            onReceiveAudio(dataSnapshot);
-        }
-
-        @Override
-        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-        }
-
-        @Override
-        public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-        }
-
-        @Override
-        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-        }
-
-        @Override
-        public void onCancelled(FirebaseError firebaseError) {
-
-        }
+        Intent intent = new Intent(this, AudioService.class);
+        startService(intent);
     }
 }

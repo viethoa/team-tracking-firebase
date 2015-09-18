@@ -12,10 +12,10 @@ import com.lorem_ipsum.utils.DeviceUtils;
 import com.lorem_ipsum.utils.StringUtils;
 
 import de.greenrobot.event.EventBus;
+import us.originally.teamtrack.Constant;
 import us.originally.teamtrack.EventBus.MessageEvent;
 import us.originally.teamtrack.R;
 import us.originally.teamtrack.modules.chat.MessageModel;
-import us.originally.teamtrack.models.AudioModel;
 
 
 /**
@@ -84,7 +84,7 @@ public class FireBaseAction {
         }
 
         initListener();
-        Query messageQuery = ref.child(channelName);
+        Query messageQuery = ref.child(Constant.TEAM_GROUP).child(channelName).child(Constant.SLUG_AUDIOS);
         messageQuery.addChildEventListener(childEventListener);
     }
 
@@ -149,9 +149,5 @@ public class FireBaseAction {
         }
 
         return isNotNull;
-    }
-
-    protected static boolean isAudioValid(AudioModel audio) {
-        return (audio != null && audio.size != null && audio.size > 0 && StringUtils.isNotNull(audio.encode));
     }
 }
