@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.lorem_ipsum.utils.DeviceUtils;
+import com.lorem_ipsum.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -104,8 +105,10 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         viewHolder.vSpaceLeft.setVisibility(isMyComment ? View.VISIBLE : View.GONE);
         viewHolder.vSpaceRight.setVisibility(isMyComment ? View.GONE : View.VISIBLE);
         viewHolder.tvUserName.setText(isMyComment ? "me" : user);
-        boolean isAudioMessage = (audios != null && audios.size() > 0);
-        viewHolder.btnPlay.setVisibility(isAudioMessage ? View.VISIBLE : View.GONE);
+        boolean isShowAudioPlayer = (audios != null && audios.size() > 0);
+        viewHolder.btnPlay.setVisibility(isShowAudioPlayer ? View.VISIBLE : View.GONE);
+        boolean isShowMessage = StringUtils.isNotNull(message);
+        viewHolder.tvUserMessage.setVisibility(isShowMessage ? View.VISIBLE : View.GONE);
 
         //Play audio
         viewHolder.btnPlay.setOnClickListener(new View.OnClickListener() {
