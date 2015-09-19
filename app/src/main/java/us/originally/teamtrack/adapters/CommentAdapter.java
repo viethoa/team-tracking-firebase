@@ -104,6 +104,8 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         viewHolder.vSpaceLeft.setVisibility(isMyComment ? View.VISIBLE : View.GONE);
         viewHolder.vSpaceRight.setVisibility(isMyComment ? View.GONE : View.VISIBLE);
         viewHolder.tvUserName.setText(isMyComment ? "me" : user);
+        boolean isAudioMessage = (audios != null && audios.size() > 0);
+        viewHolder.btnPlay.setVisibility(isAudioMessage ? View.VISIBLE : View.GONE);
 
         //Play audio
         viewHolder.btnPlay.setOnClickListener(new View.OnClickListener() {
