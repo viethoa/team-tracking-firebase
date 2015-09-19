@@ -13,7 +13,7 @@ import com.lorem_ipsum.utils.StringUtils;
 
 import us.originally.teamtrack.Constant;
 import us.originally.teamtrack.models.AudioModel;
-import us.originally.teamtrack.modules.chat.audio.AudioStreamManager;
+import us.originally.teamtrack.modules.audio.AudioStreamManager;
 
 /**
  * Created by VietHoa on 18/09/15.

@@ -25,4 +25,7 @@
 
     <!-- waveform view -->
     <dimen name="waveform_btn_size">60dp</dimen>
+
+    <!-- cemment item view-->
+    <dimen name="audio_message_height">60dp</dimen>
 </resources>

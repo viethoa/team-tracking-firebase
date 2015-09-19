@@ -74,10 +74,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".controllers.AudioMessageActivity"
-            android:label="@string/title_activity_landing"
-            android:screenOrientation="portrait"/>
-        <activity
             android:name=".controllers.MainActivity"
             android:label="@string/title_activity_main"
             android:screenOrientation="portrait"

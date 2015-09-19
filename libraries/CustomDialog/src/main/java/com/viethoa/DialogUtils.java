@@ -149,8 +149,10 @@ public class DialogUtils extends DialogFragment {
         return dialog;
     }
 
+
+
     /**
-     * Simple dialog message
+     * New Simple dialog message
      */
     public static Dialog createDialogMessage(Context activity, String title, String message,
                 String cancelButton, String doneButton, boolean cancelable, final DialogListener listener) {
@@ -210,6 +212,9 @@ public class DialogUtils extends DialogFragment {
         return dialog;
     }
 
+
+
+
     /**
      * dummy menu dialog :D
      */
@@ -237,7 +242,7 @@ public class DialogUtils extends DialogFragment {
 
 
     /**
-     * Custom view Dialog
+     * Setup Custom view Dialog
      */
     private AlertDialog.Builder CustomViewDialog() {
         if (builder == null) {

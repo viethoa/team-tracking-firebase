@@ -23,7 +23,10 @@
     <color name="text_color_light">#FF999999</color>
     <color name="text_color_bright">#FFFFFFFF</color>
 
+    <color name="visualizer_color">#e5e5e5</color>
     <color name="visualizer_dark">#663A5795</color>
     <color name="chatting_header_solid">#ECECEC</color>
     <color name="chatting_header_border">#E0E0E0</color>
+    <color name="audio_message_bg_color">#607D8B</color>
+    <color name="audio_message_bg_dark">#57717E</color>
 </resources>

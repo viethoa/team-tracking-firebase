@@ -1,4 +1,4 @@
-package us.originally.teamtrack.modules.chat.audio;
+package us.originally.teamtrack.modules.audio;
 
 /**
  * Created by VietHoa on 03/09/15.

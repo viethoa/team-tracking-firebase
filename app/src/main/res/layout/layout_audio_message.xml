@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/chatting_view_margin_bottom">
+
+    <ImageButton
+        android:id="@+id/btn_speak"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/chatting_view_margin_bottom"
+        android:contentDescription="@string/empty_string"
+        android:background="@drawable/audio_message_bg"
+        android:padding="8dp"
+        android:scaleType="centerInside"
+        android:src="@mipmap/ic_micro_bright"/>
+
+    <ImageView
+        android:id="@+id/iv_back"
+        android:layout_width="40dp"
+        android:layout_height="@dimen/chatting_view_margin_bottom"
+        android:contentDescription="@string/empty_string"
+        android:padding="@dimen/medium_space"
+        android:scaleType="centerInside"
+        android:src="@mipmap/ic_arrow_back"/>
+
+    <ImageView
+        android:id="@+id/iv_effect"
+        android:layout_width="@dimen/chatting_view_margin_bottom"
+        android:layout_height="@dimen/chatting_view_margin_bottom"
+        android:contentDescription="@string/empty_string"
+        android:layout_centerInParent="true"
+        android:src="@drawable/shape_circle_view"
+        android:alpha="0.2"/>
+</RelativeLayout>

@@ -1,6 +1,7 @@
 package us.originally.teamtrack.customviews;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.support.v7.widget.LinearLayoutManager;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 
+import com.lorem_ipsum.utils.DeviceUtils;
 import com.lorem_ipsum.utils.StringUtils;
 
 import java.util.ArrayList;
@@ -20,14 +22,17 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import us.originally.teamtrack.R;
 import us.originally.teamtrack.adapters.CommentAdapter;
+import us.originally.teamtrack.models.AudioModel;
 import us.originally.teamtrack.models.Comment;
 
 /**
  * Created by VietHoa on 10/09/15.
  */
-public class ChattingView extends RelativeLayout {
+public class ChattingView extends RelativeLayout implements
+        AudioMessageView.AnimateListener, AudioMessageView.AudioMessageListener {
 
     private static final int LIMIT_TIME_TO_JOIN_COMMENT = 5;
+    private static final int DURATION = 300;
 
     protected ChattingViewListener listener;
     protected ArrayList<Comment> mDataArray;
@@ -37,6 +42,12 @@ public class ChattingView extends RelativeLayout {
     EditText etComment;
     @InjectView(R.id.my_recycler_view)
     RecyclerView mRecyclerView;
+    @InjectView(R.id.iv_voice_message)
+    View vVoiceMessage;
+    @InjectView(R.id.audio_box)
+    AudioMessageView mAudioBox;
+    @InjectView(R.id.send_comment_box)
+    View mCommentBox;
 
     public ChattingView(Context context) {
         super(context);
@@ -69,7 +80,10 @@ public class ChattingView extends RelativeLayout {
 
     public interface ChattingViewListener {
         void onCloseChatBox();
+
         void onPushComment(String comment);
+
+        void OnPushAudioMessage(ArrayList<AudioModel> audios);
     }
 
     //----------------------------------------------------------------------------------------------
@@ -91,6 +105,16 @@ public class ChattingView extends RelativeLayout {
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
+
+        //Audio box
+        mAudioBox.setAnimateListener(this);
+        mAudioBox.setAudioListener(this);
+        mAudioBox.post(new Runnable() {
+            @Override
+            public void run() {
+                hideAudioMessageView(false);
+            }
+        });
     }
 
     //----------------------------------------------------------------------------------------------
@@ -98,8 +122,15 @@ public class ChattingView extends RelativeLayout {
     //----------------------------------------------------------------------------------------------
 
     public void pushComment(Comment comment) {
+        if (comment == null)
+            return;
+
         //Add new comment
-        handleAddNewMessage(comment);
+        if (comment.audios != null && comment.audios.size() > 0) {
+            mDataArray.add(comment);
+        } else {
+            handleAddNewMessage(comment);
+        }
         mAdapter.refreshDataChange(mDataArray);
 
         //Scroll to bottom
@@ -113,34 +144,23 @@ public class ChattingView extends RelativeLayout {
     // Event
     //----------------------------------------------------------------------------------------------
 
-    protected void handleAddNewMessage(Comment comment) {
-        if (comment == null || StringUtils.isNull(comment.message))
+    @Override
+    public void OnPushAudioMessage(ArrayList<AudioModel> audios) {
+        if (audios == null || audios.size() <= 0)
+            return;
+        if (listener == null)
+            return;
+        listener.OnPushAudioMessage(audios);
+    }
+
+    @OnClick(R.id.iv_voice_message)
+    protected void onBtnVoiceClicked() {
+        showAudioMessageBox();
+        Activity activity = (Activity) getContext();
+        if (activity == null)
             return;
 
-        if (mDataArray == null || mDataArray.size() <= 0) {
-            mDataArray = new ArrayList<>();
-            mDataArray.add(comment);
-            return;
-        }
-
-        int lastIndex = mDataArray.size() - 1;
-        Comment lastComment = mDataArray.get(lastIndex);
-        if (lastComment == null || lastComment.user == null || comment.user == null ||
-                StringUtils.isNull(comment.user.device_uuid) || StringUtils.isNull(lastComment.user.device_uuid)) {
-            mDataArray.add(comment);
-            Collections.sort(mDataArray);
-            return;
-        }
-
-        long minute = Math.abs((lastComment.time_stamp - comment.time_stamp) / (1000 * 60)) % 60;
-        if (comment.user.device_uuid.equals(lastComment.user.device_uuid) && minute <= LIMIT_TIME_TO_JOIN_COMMENT) {
-            lastComment.message += "\n\n" + comment.message;
-            Collections.sort(mDataArray);
-            return;
-        }
-
-        mDataArray.add(comment);
-        Collections.sort(mDataArray);
+        DeviceUtils.hideKeyboard(activity);
     }
 
     @OnClick(R.id.header_box)
@@ -168,5 +188,68 @@ public class ChattingView extends RelativeLayout {
             return;
 
         listener.onPushComment(comment);
+    }
+
+    @Override
+    public void OnAudioBoxHidden() {
+        mCommentBox.animate().translationY(0f).setDuration(DURATION).start();
+    }
+
+    protected void hideAudioMessageView(boolean withAnimate) {
+        float height = mAudioBox.getHeight();
+        if (height <= 0)
+            return;
+
+        if (!withAnimate) {
+            mAudioBox.setTranslationY(height);
+            return;
+        }
+
+        mAudioBox.animate().translationY(height).setDuration(DURATION).start();
+    }
+
+    protected void showAudioMessageBox() {
+        float height = mCommentBox.getHeight();
+        if (height <= 0)
+            return;
+
+        mCommentBox.animate().translationY(height).setDuration(DURATION).start();
+        mAudioBox.animate().translationY(0f).setDuration(DURATION).start();
+    }
+
+    protected void handleAddNewMessage(Comment comment) {
+        if (comment == null || StringUtils.isNull(comment.message))
+            return;
+
+        //Don't have anything in no comment
+        if (mDataArray == null || mDataArray.size() <= 0) {
+            mDataArray = new ArrayList<>();
+            mDataArray.add(comment);
+            return;
+        }
+
+        //Just add new comment by another user
+        int lastIndex = mDataArray.size() - 1;
+        Comment lastComment = mDataArray.get(lastIndex);
+        if (lastComment == null || lastComment.user == null || comment.user == null ||
+                StringUtils.isNull(comment.user.device_uuid) || StringUtils.isNull(lastComment.user.device_uuid)) {
+            mDataArray.add(comment);
+            Collections.sort(mDataArray);
+            return;
+        }
+
+        //Need to join comment by myself
+        long minute = Math.abs((lastComment.time_stamp - comment.time_stamp) / (1000 * 60)) % 60;
+        if (comment.user.device_uuid.equals(lastComment.user.device_uuid) && minute <= LIMIT_TIME_TO_JOIN_COMMENT) {
+            if (StringUtils.isNull(lastComment.message))
+                lastComment.message = "\n" + comment.message;
+            else
+                lastComment.message += "\n\n" + comment.message;
+            Collections.sort(mDataArray);
+            return;
+        }
+
+        mDataArray.add(comment);
+        Collections.sort(mDataArray);
     }
 }

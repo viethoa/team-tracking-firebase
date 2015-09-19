@@ -24,6 +24,7 @@ import us.originally.teamtrack.R;
 public class VisualizerView extends RelativeLayout {
     private static final String TAG = "Visualize";
 
+    private static final int WAIT_TIME_TO_SPEAK = 1000;
     private static final int DURATION = 200;
     private static final float MAX_SCALE = 2.5f;
     private static final float MIN_SCALE = 1.3f;
@@ -117,7 +118,7 @@ public class VisualizerView extends RelativeLayout {
     }
 
     //----------------------------------------------------------------------------------------------
-    // Touch listener
+    // Touch AnimateListener
     //----------------------------------------------------------------------------------------------
 
     protected class VisualizeTouchEvent implements OnTouchListener {
@@ -154,16 +155,18 @@ public class VisualizerView extends RelativeLayout {
         }
 
         protected void onTouchEntered() {
-            if (listener != null) {
-                listener.onSpeaking();
-            }
-
+            //Take background effect
             Resources res = getContext().getResources();
             final int newColor = res.getColor(R.color.visualizer_dark);
             vBackground.setColorFilter(newColor);
 
+            //Animate for speak
             isStopRecording = false;
             animationSpeaking(2f, DURATION);
+
+            //delay before start record
+            Handler waiTime = new Handler();
+            waiTime.postDelayed(new WaitTimeRunnable(), WAIT_TIME_TO_SPEAK);
         }
 
         protected void onTouchLeaved() {
@@ -175,6 +178,16 @@ public class VisualizerView extends RelativeLayout {
             vBackground.setColorFilter(null);
             vAnimationSpeaking.animate().scaleX(NORMAL_SCALE).start();
             vAnimationSpeaking.animate().scaleY(NORMAL_SCALE).start();
+        }
+
+        protected class WaitTimeRunnable implements Runnable {
+            @Override
+            public void run() {
+                if (listener == null)
+                    return;
+
+                listener.onSpeaking();
+            }
         }
     }
 }

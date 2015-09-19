@@ -16,6 +16,7 @@ import com.lorem_ipsum.utils.StringUtils;
 import com.viethoa.DialogUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.inject.Inject;
 
@@ -29,10 +30,11 @@ import us.originally.teamtrack.controllers.base.TeamBaseActivity;
 import us.originally.teamtrack.customviews.ChattingView;
 import us.originally.teamtrack.customviews.VisualizerView;
 import us.originally.teamtrack.managers.GPSTrackerManager;
+import us.originally.teamtrack.models.AudioModel;
 import us.originally.teamtrack.models.Comment;
 import us.originally.teamtrack.models.TeamModel;
 import us.originally.teamtrack.models.UserTeamModel;
-import us.originally.teamtrack.modules.chat.audio.AudioStreamManager;
+import us.originally.teamtrack.modules.audio.AudioStreamManager;
 import us.originally.teamtrack.modules.dagger.managers.UserManager;
 import us.originally.teamtrack.services.AudioService;
 import us.originally.teamtrack.services.LocationTrackingService;
@@ -296,7 +298,7 @@ public class MainActivity extends TeamBaseActivity implements
 
     @Override
     protected void onShowComment(Comment comment) {
-        if (comment == null || StringUtils.isNull(comment.message))
+        if (comment == null)
             return;
 
         if (comment.id > CommentId) {
@@ -317,7 +319,18 @@ public class MainActivity extends TeamBaseActivity implements
 
         CommentId += 1;
         long timeStamp = System.currentTimeMillis();
-        Comment userComment = new Comment(CommentId, timeStamp, comment, mUser);
+        Comment userComment = new Comment(CommentId, timeStamp, comment, null, mUser);
+        userManager.pushComment(userComment);
+    }
+
+    @Override
+    public void OnPushAudioMessage(ArrayList<AudioModel> audios) {
+        if (audios == null || audios.size() <= 0)
+            return;
+
+        CommentId += 1;
+        long timeStamp = System.currentTimeMillis();
+        Comment userComment = new Comment(CommentId, timeStamp, null, audios, mUser);
         userManager.pushComment(userComment);
     }
 
@@ -331,7 +344,7 @@ public class MainActivity extends TeamBaseActivity implements
         if (comment.user != null && StringUtils.isNotNull(comment.message))
             tvUserComment.setText(comment.message);
 
-        //Take notify box
+        //Show notify box
         final float screenWidth = DeviceUtils.getDeviceScreenWidth(this);
         mNotifyCommentBox.animate().translationX(0f).start();
         mNotifyCommentBox.animate().alpha(1f).start();

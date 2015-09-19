@@ -1,6 +1,5 @@
-package us.originally.teamtrack.modules.chat.audio;
+package us.originally.teamtrack.modules.audio;
 
-import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
@@ -8,65 +7,64 @@ import android.media.MediaRecorder;
 import android.util.Base64;
 import android.util.Log;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.greenrobot.event.EventBus;
 import us.originally.teamtrack.EventBus.VisualizeEvent;
 import us.originally.teamtrack.models.AudioModel;
+import us.originally.teamtrack.models.UserTeamModel;
+import us.originally.teamtrack.modules.dagger.managers.UserManager;
 
 /**
- * Created by VietHoa on 03/09/15.
+ * Created by VietHoa on 07/09/15.
  */
-public class AudioRecordManager {
-
-    private static final String LOG_TAG = "AudioRecordManager";
+public class AudioStreamManager {
+    private static final String LOG_TAG = "AudioStreamManager";
 
     private static AudioRecord mRecorder = null;
     private static AudioTrack mPlayer = null;
 
-    private static int sampleRate = 8000;
+    private static int sampleRate = 8000; //44100;
     private static int channelConfig = AudioFormat.CHANNEL_IN_MONO;
     private static int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
     private static int minBufSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat);
-    private static int bufferSize = 4096;
+    private static int bufferSize = 10240;
 
     private static CMG711 uLawCodec = new CMG711();
-    public static ArrayList<AudioModel> AudiosEndCoded;
-
-    private static boolean isRecording = false;
     private static EventBus eventBus = new EventBus();
-
-    public static boolean isRecording() {
-        return mPlayer != null;
-    }
+    private static int audio_limit_id = 50;
 
     //**********************************************************************************************
     //  Player
     //**********************************************************************************************
 
-    public static void startPlaying(List<AudioModel> AudiosEndCoded) {
-        mPlayer = new AudioTrack(android.media.AudioManager.STREAM_MUSIC,
-                sampleRate,
-                AudioFormat.CHANNEL_CONFIGURATION_MONO,
-                audioFormat,
-                minBufSize,
+    protected static void initialisePlayer() {
+        mPlayer = new AudioTrack(android.media.AudioManager.STREAM_MUSIC, sampleRate,
+                AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT, minBufSize,
                 AudioTrack.MODE_STREAM);
         mPlayer.play();
+    }
 
-        Log.d(LOG_TAG, "AudioEndCode: " + AudiosEndCoded.size());
-        for (AudioModel item : AudiosEndCoded) {
-            byte[] audio = Base64.decode(item.encode, 2);
-
-            //Decoding:
-            byte[] byteArray = new byte[item.size * 2];
-            uLawCodec.decode(audio, 0, item.size, byteArray);
-
-            //Play
-            mPlayer.write(byteArray, 0, item.size);
+    public static void startPlaying(final AudioModel audioModel) {
+        if (mPlayer == null) {
+            initialisePlayer();
         }
 
-        stopPlaying();
+        //Base 64 decode
+        byte[] audio = Base64.decode(audioModel.encode, 2);
+
+        //uLaw Decoding
+        final byte[] byteArray = new byte[audioModel.size * 2];
+        uLawCodec.decode(audio, 0, audioModel.size, byteArray);
+
+        //Play
+        final byte[] buffer = byteArray;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (mPlayer) {
+                    mPlayer.write(buffer, 0, audioModel.size);
+                }
+            }
+        }).start();
     }
 
     public static void stopPlaying() {
@@ -81,29 +79,22 @@ public class AudioRecordManager {
     //  Recorder
     //**********************************************************************************************
 
-    public static void startRecording(Context context) {
-        mRecorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
-                sampleRate,
-                channelConfig,
-                audioFormat,
-                minBufSize * 10);
-        mRecorder.startRecording();
+    public static boolean isRecording() {
+        return mRecorder != null;
+    }
 
-        isRecording = true;
-        int audioTimeStamp = 0;
+    public static void startRecording(UserTeamModel user, UserManager userManager) {
+        mRecorder = new AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, channelConfig, audioFormat, minBufSize * 10);
+        mRecorder.startRecording();
+        int audioId = 0;
 
         //Encoding:
-        Log.d(LOG_TAG, String.valueOf(minBufSize));
-        byte[] buffer = new byte[minBufSize];
-        byte[] outBuffer = new byte[minBufSize];
+        byte[] buffer = new byte[bufferSize];
+        byte[] outBuffer = new byte[bufferSize];
         int size;
 
-        //Audio byte store
-        AudiosEndCoded = new ArrayList<>();
-
         //Capture audio
-        while (mRecorder != null && isRecording) {
-            audioTimeStamp += 1;
+        while (mRecorder != null) {
             size = mRecorder.read(buffer, 0, buffer.length);
 
             //Take audio waveform
@@ -116,11 +107,26 @@ public class AudioRecordManager {
             //Base64 encoding
             String strEncoded = Base64.encodeToString(outBuffer, 2);
 
-            //Capture audio
+            //Stream audio data
+            audioId += 1;
+            if (audioId > audio_limit_id) {
+                audioId = 1;
+            }
             long timeStamp = System.currentTimeMillis();
-            AudioModel item = new AudioModel(strEncoded, size, audioTimeStamp, timeStamp, null);
-            AudiosEndCoded.add(item);
+            AudioModel audio = new AudioModel(strEncoded, size, audioId, timeStamp, user);
+            userManager.pushAudio(audio);
         }
+    }
+
+    public static void stopRecording() {
+        if (mRecorder == null)
+            return;
+
+        mRecorder.stop();
+        mRecorder.release();
+        mRecorder = null;
+
+        Log.d(LOG_TAG, "encode: stop");
     }
 
     protected static float calculatePowerDb(byte[] buffer, int readSize) {
@@ -136,18 +142,5 @@ public class AudioRecordManager {
         }
 
         return max;
-    }
-
-    public static ArrayList<AudioModel> stopRecording() {
-        isRecording = false;
-        if (mRecorder != null) {
-            mRecorder.stop();
-            mRecorder.release();
-        }
-
-        mRecorder = null;
-        Log.d(LOG_TAG, "encode: stop");
-
-        return AudiosEndCoded;
     }
 }

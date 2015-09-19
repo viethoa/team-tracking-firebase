@@ -123,7 +123,7 @@ public class GPSTrackerManager extends Service implements LocationListener {
     }
 
     /**
-     * Stop using GPS listener
+     * Stop using GPS AnimateListener
      * Calling this function will stop using GPS in your app
      */
 

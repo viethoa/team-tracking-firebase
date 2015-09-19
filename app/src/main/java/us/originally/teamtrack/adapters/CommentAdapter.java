@@ -1,22 +1,27 @@
 package us.originally.teamtrack.adapters;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.lorem_ipsum.utils.DeviceUtils;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import us.originally.teamtrack.R;
+import us.originally.teamtrack.models.AudioModel;
 import us.originally.teamtrack.models.Comment;
+import us.originally.teamtrack.modules.audio.AudioRecordManager;
 
 /**
  * Created by VietHoa on 14/09/15.
@@ -49,6 +54,8 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         View vSpaceLeft;
         @InjectView(R.id.view_right)
         View vSpaceRight;
+        @InjectView(R.id.btn_play)
+        Button btnPlay;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -64,11 +71,13 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder viewHolder, int position) {
+    public void onBindViewHolder(final ViewHolder viewHolder, int position) {
         if (position < 0 || position >= mDataArray.size())
             return;
 
-        Comment comment = mDataArray.get(position);
+        //Model------------------------------------------------
+        final Comment comment = mDataArray.get(position);
+        List<AudioModel> audios = null;
         String message = "";
         String user = "";
         String userUuid = "";
@@ -76,6 +85,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
 
         if (comment != null) {
             message = comment.message;
+            audios = comment.audios;
             timeStamp = convertToDateTime(comment.time_stamp);
             if (comment.user != null) {
                 user = comment.user.name;
@@ -83,15 +93,27 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
             }
         }
 
+        //View--------------------------------------------------
         viewHolder.tvUserName.setText(user);
         viewHolder.tvUserMessage.setText(message);
         viewHolder.tvTimeStamp.setText(timeStamp);
 
+        //Setup my comment
         String uuid = DeviceUtils.getDeviceUUID(mContext);
         boolean isMyComment = uuid.equals(userUuid);
         viewHolder.vSpaceLeft.setVisibility(isMyComment ? View.VISIBLE : View.GONE);
         viewHolder.vSpaceRight.setVisibility(isMyComment ? View.GONE : View.VISIBLE);
         viewHolder.tvUserName.setText(isMyComment ? "me" : user);
+
+        //Play audio
+        viewHolder.btnPlay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (comment.audios == null || comment.audios.size() <= 0)
+                    return;
+                OnPlayAudioMessage(viewHolder, comment.audios);
+            }
+        });
     }
 
     @Override
@@ -99,6 +121,59 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         if (mDataArray == null)
             return 0;
         return mDataArray.size();
+    }
+
+    protected void OnPlayAudioMessage(ViewHolder holder, List<AudioModel> audios) {
+        if (AudioRecordManager.isPlaying())
+            return;
+
+        holder.btnPlay.setCompoundDrawablesWithIntrinsicBounds(
+                mContext.getResources().getDrawable(R.mipmap.ic_pause), null, null, null);
+
+        AudioRecordManager.setAudioRecordListener(new AudioListener(holder));
+        Thread player = new AudioPlay(audios);
+        player.start();
+    }
+
+    protected class AudioPlay extends Thread {
+        private List<AudioModel> audios;
+
+        public AudioPlay(List<AudioModel> audios) {
+            this.audios = audios;
+        }
+
+        @Override
+        public void run() {
+            AudioRecordManager.startPlaying(audios);
+        }
+    }
+
+    protected class AudioListener implements AudioRecordManager.AudioRecordListener {
+        private ViewHolder holder;
+
+        public AudioListener(ViewHolder holder) {
+            this.holder = holder;
+        }
+
+        @Override
+        public void OnPlayStopped() {
+            AudioRecordManager.setAudioRecordListener(null);
+            Activity activity = (Activity) mContext;
+            if (activity == null)
+                return;
+
+            updatePlayIcon(activity);
+        }
+
+        protected void updatePlayIcon(Activity activity) {
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    holder.btnPlay.setCompoundDrawablesWithIntrinsicBounds(
+                            mContext.getResources().getDrawable(R.mipmap.ic_play), null, null, null);
+                }
+            });
+        }
     }
 
     protected String convertToDateTime(long millisecond) {
